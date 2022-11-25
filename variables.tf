@@ -2,7 +2,7 @@ variable "name" {
   type = string
 }
 
-variable "resource_prefix" {
+variable "name_prefix" {
   type = string
 }
 
