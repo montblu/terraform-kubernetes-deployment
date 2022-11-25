@@ -10,3 +10,8 @@ variable "ecr_create" {
   type    = bool
   default = true
 }
+
+variable "ecr_scan_on_push" {
+  type    = bool
+  default = true
+}
