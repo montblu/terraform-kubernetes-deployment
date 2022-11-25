@@ -34,4 +34,8 @@ resource "aws_ecr_lifecycle_policy" "main" {
     ]
 }
 EOF
+
+  depends_on = [
+    aws_ecr_repository.main
+  ]
 }
