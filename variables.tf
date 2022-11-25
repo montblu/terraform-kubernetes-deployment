@@ -20,3 +20,8 @@ variable "ecr_number_of_images_to_keep" {
   type    = number
   default = 30
 }
+
+variable "svc_create" {
+  type    = bool
+  default = true
+}
