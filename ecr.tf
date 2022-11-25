@@ -1,7 +1,7 @@
 resource "aws_ecr_repository" "main" {
   count = var.ecr_create ? 1 : 0
 
-  name = "${var.name_prefix}-${var.name}"
+  name = local.resource_name
 
   image_scanning_configuration {
     scan_on_push = var.ecr_scan_on_push
