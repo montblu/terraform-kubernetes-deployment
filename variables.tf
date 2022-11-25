@@ -25,3 +25,8 @@ variable "svc_create" {
   type    = bool
   default = true
 }
+
+variable "svc_type" {
+  type = string
+  default = "ClusterIP"
+}
