@@ -26,8 +26,12 @@ variable "svc_create" {
   default = true
 }
 
+variable "svc_port" {
+  type = number
+}
+
 variable "svc_type" {
-  type = string
+  type    = string
   default = "ClusterIP"
 }
 
