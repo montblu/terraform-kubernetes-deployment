@@ -66,3 +66,8 @@ variable "svc_type" {
   type    = string
   default = "ClusterIP"
 }
+
+variable "wait_for_rollout" {
+  type = bool
+  default = false
+}
