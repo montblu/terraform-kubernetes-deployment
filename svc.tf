@@ -12,10 +12,9 @@ resource "kubernetes_service" "main" {
 
   spec {
     port {
-      name        = "gunicorn"
-      protocol    = "TCP"
-      port        = 80
-      target_port = "5000"
+      port        = var.svc_port
+      target_port = var.svc_port
+      protocol    = var.svc_protocol
     }
 
     selector = {
