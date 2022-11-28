@@ -30,6 +30,11 @@ variable "svc_port" {
   type = number
 }
 
+variable "svc_protocol" {
+  type    = string
+  default = "TCP"
+}
+
 variable "svc_type" {
   type    = string
   default = "ClusterIP"
