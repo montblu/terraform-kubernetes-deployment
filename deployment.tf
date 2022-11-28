@@ -5,25 +5,19 @@ resource "kubernetes_deployment" "main" {
 
     annotations = {}
 
-    labels = {
-      app = local.resource_name
-    }
+    labels = local.labes
   }
 
   spec {
     replicas = var.replicas
 
     selector {
-      match_labels = {
-        app = local.resource_name
-      }
+      match_labels = local.labels
     }
 
     template {
       metadata {
-        labels = {
-          app = local.resource_name
-        }
+        labels = local.labels
       }
 
       spec {
