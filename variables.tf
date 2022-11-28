@@ -26,6 +26,11 @@ variable "annotations" {
   default = []
 }
 
+variable "image" {
+  type    = string
+  default = "dummy"
+}
+
 variable "labels" {
   type    = list(any)
   default = []
