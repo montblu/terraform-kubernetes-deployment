@@ -21,6 +21,16 @@ variable "ecr_number_of_images_to_keep" {
   default = 30
 }
 
+variable "deployment_annotations" {
+  type    = list(any)
+  default = []
+}
+
+variable "deployment_labels" {
+  type    = list(any)
+  default = []
+}
+
 variable "deployment_replicas" {
   type    = number
   default = 1
