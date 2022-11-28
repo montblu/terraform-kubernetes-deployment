@@ -5,7 +5,7 @@ resource "kubernetes_deployment" "main" {
 
     annotations = {}
 
-    labels = local.labes
+    labels = local.labels
   }
 
   spec {
