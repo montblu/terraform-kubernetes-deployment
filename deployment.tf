@@ -32,6 +32,13 @@ resource "kubernetes_deployment" "main" {
     }
   }
 
+  lifecycle {
+    ignore_changes = [
+      spec[0].template[0].metadata[0].annotations["reloader.stakater.com/last-reloaded-from"],
+      spec[0].template[0].spec[0].container[0].image
+    ]
+  }
+
   depends_on = [
     aws_ecr_lifecycle_policy.main
   ]
