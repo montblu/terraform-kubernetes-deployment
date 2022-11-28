@@ -38,6 +38,8 @@ resource "kubernetes_deployment" "main" {
     ]
   }
 
+  wait_for_rollout = var.wait_for_rollout
+
   depends_on = [
     aws_ecr_lifecycle_policy.main
   ]
