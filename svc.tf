@@ -23,4 +23,8 @@ resource "kubernetes_service" "main" {
 
     type = var.svc_type
   }
+
+  depends_on = [
+    kubernetes_deployment.main
+  ]
 }
