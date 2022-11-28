@@ -31,7 +31,7 @@ variable "command" {
 
 variable "image" {
   type    = string
-  default = "dummy"
+  default = ""
 }
 
 variable "labels" {
@@ -68,6 +68,6 @@ variable "svc_type" {
 }
 
 variable "wait_for_rollout" {
-  type = bool
+  type    = bool
   default = false
 }
