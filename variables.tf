@@ -21,17 +21,21 @@ variable "ecr_number_of_images_to_keep" {
   default = 30
 }
 
-variable "deployment_annotations" {
+variable "annotations" {
   type    = list(any)
   default = []
 }
 
-variable "deployment_labels" {
+variable "labels" {
   type    = list(any)
   default = []
 }
 
-variable "deployment_replicas" {
+variable "namespace" {
+  type = string
+}
+
+variable "replicas" {
   type    = number
   default = 1
 }
@@ -53,8 +57,4 @@ variable "svc_protocol" {
 variable "svc_type" {
   type    = string
   default = "ClusterIP"
-}
-
-variable "namespace" {
-  type = string
 }
