@@ -27,6 +27,7 @@ variable "annotations" {
 }
 variable "command" {
   type = list(string)
+  default = []
 }
 
 variable "image" {
