@@ -25,7 +25,7 @@ resource "kubernetes_deployment" "main" {
         container {
           name    = local.resource_name
           image   = local.image
-          command = local.command
+          command = var.command
         }
       }
     }
