@@ -22,8 +22,8 @@ variable "ecr_number_of_images_to_keep" {
 }
 
 variable "annotations" {
-  type    = list(any)
-  default = []
+  type    = map(any)
+  default = {}
 }
 variable "command" {
   type = list(string)
@@ -35,8 +35,8 @@ variable "image" {
 }
 
 variable "labels" {
-  type    = list(any)
-  default = []
+  type    = map(any)
+  default = {}
 }
 
 variable "namespace" {
