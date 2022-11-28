@@ -55,6 +55,6 @@ variable "svc_type" {
   default = "ClusterIP"
 }
 
-variable "k8s_namespace" {
+variable "namespace" {
   type = string
 }
