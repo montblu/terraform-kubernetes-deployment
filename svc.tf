@@ -3,7 +3,7 @@ resource "kubernetes_service" "main" {
 
   metadata {
     name      = local.resource_name
-    namespace = "${var.name_prefix}-app"
+    namespace = var.k8s_namespace
 
     labels = {
       app = local.resource_name
