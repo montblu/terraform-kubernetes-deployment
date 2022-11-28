@@ -1,5 +1,7 @@
 locals {
   resource_name = "${var.name_prefix}-${var.name}"
+
+  annotations = var.annotations
   default_labels = {
     app = local.resource_name
   }
