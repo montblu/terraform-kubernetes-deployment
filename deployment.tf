@@ -3,9 +3,8 @@ resource "kubernetes_deployment" "main" {
     name      = local.resource_name
     namespace = var.namespace
 
-    annotations = {}
-
-    labels = local.labels
+    annotations = local.annotations
+    labels      = local.labels
   }
 
   spec {
