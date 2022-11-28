@@ -30,3 +30,7 @@ variable "svc_type" {
   type = string
   default = "ClusterIP"
 }
+
+variable "k8s_namespace" {
+  type = string
+}
