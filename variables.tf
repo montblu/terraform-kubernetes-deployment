@@ -85,7 +85,7 @@ variable "svc_type" {
 variable "svc_monitor_create" {
   type        = bool
   default     = false
-  description = "Controls whether a ServiceMonitor should be created."
+  description = "Controls whether a ServiceMonitor should be created. The `svc_create` is required to be enabled."
 }
 
 variable "svc_monitor_path" {
