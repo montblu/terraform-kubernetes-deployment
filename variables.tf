@@ -88,6 +88,12 @@ variable "svc_monitor_create" {
   description = "Controls whether a ServiceMonitor should be created."
 }
 
+variable "svc_monitor_path" {
+  type        = string
+  default     = "/metrics"
+  description = "Controls where the ServiceMonitor should scrape from."
+}
+
 variable "wait_for_rollout" {
   type        = bool
   default     = false
