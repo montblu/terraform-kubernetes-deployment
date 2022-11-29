@@ -60,6 +60,18 @@ variable "replicas" {
   description = "The number of desired replicas."
 }
 
+variable "resource_limits" {
+  type        = map(any)
+  default     = {}
+  description = "Describes the maximum amount of compute resources allowed."
+}
+
+variable "resource_requests" {
+  type        = map(any)
+  default     = {}
+  description = "Describes the minimum amount of compute resources required."
+}
+
 variable "svc_create" {
   type        = bool
   default     = true
