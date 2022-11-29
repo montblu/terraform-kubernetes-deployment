@@ -26,6 +26,11 @@ resource "kubernetes_deployment" "main" {
           name    = local.resource_name
           image   = local.image
           command = var.command
+
+          resources {
+            limits   = var.resource_limits
+            requests = var.resource_requests
+          }
         }
       }
     }
