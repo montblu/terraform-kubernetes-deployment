@@ -82,6 +82,12 @@ variable "svc_type" {
   description = "Controls the type of the service created."
 }
 
+variable "svc_monitor_create" {
+  type        = bool
+  default     = false
+  description = "Controls whether a ServiceMonitor should be created."
+}
+
 variable "wait_for_rollout" {
   type        = bool
   default     = false
