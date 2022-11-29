@@ -1,4 +1,6 @@
 resource "kubectl_manifest" "main" {
+  count = var.svc_create ? (var.svc_monitor_create ? 1 : 0) : 0
+
   yaml_body = <<YAML
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
