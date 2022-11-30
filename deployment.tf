@@ -23,7 +23,15 @@ resource "kubernetes_deployment" "main" {
         volume {}
 
         container {
-          args              = var.args
+          args = var.args
+          dynamic "env" {
+            for_each = var.envs
+            content {
+              name       = block_device_mappings.value.device_name
+              value      = lookup(block_device_mappings.value, "value", "")
+              value_from = lookup(block_device_mappings.value, "value_from", "")
+            }
+          }
           command           = var.command
           name              = local.resource_name
           image             = local.image
