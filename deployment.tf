@@ -23,9 +23,10 @@ resource "kubernetes_deployment" "main" {
         volume {}
 
         container {
+          args    = var.args
+          command = var.command
           name    = local.resource_name
           image   = local.image
-          command = var.command
 
           resources {
             limits   = var.resource_limits
