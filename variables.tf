@@ -8,6 +8,12 @@ variable "name_prefix" {
   description = "Prefix that is going to be added to deployment name."
 }
 
+variable "args" {
+  type        = list(string)
+  default     = []
+  description = "Arguments to the entrypoint."
+}
+
 variable "ecr_create" {
   type        = bool
   default     = true
