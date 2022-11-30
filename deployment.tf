@@ -28,6 +28,7 @@ resource "kubernetes_deployment" "main" {
           name              = local.resource_name
           image             = local.image
           image_pull_policy = var.image_pull_policy
+          working_dir       = var.working_dir
 
           resources {
             limits   = var.resource_limits
