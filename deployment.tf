@@ -23,10 +23,11 @@ resource "kubernetes_deployment" "main" {
         volume {}
 
         container {
-          args    = var.args
-          command = var.command
-          name    = local.resource_name
-          image   = local.image
+          args              = var.args
+          command           = var.command
+          name              = local.resource_name
+          image             = local.image
+          image_pull_policy = var.image_pull_policy
 
           resources {
             limits   = var.resource_limits
