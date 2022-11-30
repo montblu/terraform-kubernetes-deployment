@@ -49,6 +49,12 @@ variable "image" {
   description = "Docker image name."
 }
 
+variable "image_pull_policy" {
+  type        = string
+  default     = "IfNotPresent"
+  description = "Image pull policy. One of Always, Never, IfNotPresent."
+}
+
 variable "labels" {
   type        = map(any)
   default     = {}
