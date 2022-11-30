@@ -123,3 +123,9 @@ variable "wait_for_rollout" {
   default     = false
   description = "Controls wheter Terraform should wait for deployment to be healthy."
 }
+
+variable "working_dir" {
+  type        = string
+  default     = ""
+  description = "Container's working directory."
+}
