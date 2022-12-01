@@ -49,6 +49,12 @@ variable "envs" {
   description = "Block of string name and value pairs to set in the container's environment."
 }
 
+variable "envs_from" {
+  type        = any
+  default     = {}
+  description = "List of sources to populate environment variables in the container."
+}
+
 variable "image" {
   type        = string
   default     = ""
