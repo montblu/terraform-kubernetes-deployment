@@ -142,6 +142,12 @@ variable "svc_monitor_path" {
   description = "Controls where the ServiceMonitor should scrape from."
 }
 
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "A map of tags to add to all resources"
+}
+
 variable "volume" {
   type        = map(any)
   default     = {}
