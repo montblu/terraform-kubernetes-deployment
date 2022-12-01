@@ -33,6 +33,26 @@ resource "kubernetes_deployment" "main" {
               value_from = lookup(env.value, "value_from", "")
             }
           }
+          dynamic "env_from" {
+            for_each = var.envs_from
+            content {
+              dynamic "config_map_ref" {
+                for_each = lookup(env_from.value, "config_map_ref", [])
+                content {
+                  name     = lookup(config_map_ref.value, "name", null)
+                  optional = lookup(config_map_ref.value, "name", null)
+                }
+              }
+              prefix = lookup(env_from.value, "prefix", null)
+              dynamic "secret_ref" {
+                for_each = lookup(env_from.value, "config_map_ref", [])
+                content {
+                  name     = lookup(config_map_ref.value, "name", null)
+                  optional = lookup(config_map_ref.value, "name", null)
+                }
+              }
+            }
+          }
           name              = local.resource_name
           image             = local.image
           image_pull_policy = var.image_pull_policy
