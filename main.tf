@@ -1,3 +1,6 @@
+################################################################################
+# ECR Repository
+################################################################################
 resource "aws_ecr_repository" "main" {
   count = var.ecr_create ? 1 : 0
 
@@ -8,8 +11,10 @@ resource "aws_ecr_repository" "main" {
   }
 
   encryption_configuration {
-    encryption_type = "KMS"
+    encryption_type = var.ecr_encryption_type
   }
+
+  tags = var.tags
 }
 
 resource "aws_ecr_lifecycle_policy" "main" {
@@ -38,4 +43,6 @@ EOF
   depends_on = [
     aws_ecr_repository.main
   ]
+
+  tags = var.tags
 }
