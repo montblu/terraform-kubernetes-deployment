@@ -73,6 +73,12 @@ variable "labels" {
   description = "Map of string keys and values that can be used to organize and categorize (scope and select) the deployment."
 }
 
+variable "liveness_probe" {
+  type        = map(any)
+  default     = {}
+  description = "Periodic probe of container liveness. Container will be restarted if the probe fails."
+}
+
 variable "namespace" {
   type        = string
   description = "Namespace of where the deployment will be deployed."
