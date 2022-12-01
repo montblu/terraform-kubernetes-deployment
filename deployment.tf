@@ -27,9 +27,9 @@ resource "kubernetes_deployment" "main" {
           dynamic "env" {
             for_each = var.envs
             content {
-              name       = block_device_mappings.value.device_name
-              value      = lookup(block_device_mappings.value, "value", "")
-              value_from = lookup(block_device_mappings.value, "value_from", "")
+              name       = env.value
+              value      = lookup(env.value, "value", "")
+              value_from = lookup(env.value, "value_from", "")
             }
           }
           command           = var.command
