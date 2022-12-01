@@ -29,8 +29,8 @@ resource "kubernetes_deployment" "main" {
             for_each = var.envs
             content {
               name       = env.value
-              value      = lookup(env.value, "value", "")
-              value_from = lookup(env.value, "value_from", "")
+              value      = lookup(env.value, "value", null)
+              value_from = lookup(env.value, "value_from", null)
             }
           }
           dynamic "env_from" {
