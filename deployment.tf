@@ -26,7 +26,7 @@ resource "kubernetes_deployment" "main" {
           args    = var.args
           command = var.command
           dynamic "env" {
-            for_each = var.envs
+            for_each = var.env
             content {
               name       = env.value
               value      = lookup(env.value, "value", null)
@@ -34,7 +34,7 @@ resource "kubernetes_deployment" "main" {
             }
           }
           dynamic "env_from" {
-            for_each = var.envs_from
+            for_each = var.env_from
             content {
               dynamic "config_map_ref" {
                 for_each = lookup(env_from.value, "config_map_ref", [])
@@ -45,10 +45,10 @@ resource "kubernetes_deployment" "main" {
               }
               prefix = lookup(env_from.value, "prefix", null)
               dynamic "secret_ref" {
-                for_each = lookup(env_from.value, "config_map_ref", [])
+                for_each = lookup(env_from.value, "secret_ref", [])
                 content {
-                  name     = lookup(config_map_ref.value, "name", null)
-                  optional = lookup(config_map_ref.value, "name", null)
+                  name     = lookup(secret_ref.value, "name", null)
+                  optional = lookup(secret_ref.value, "name", null)
                 }
               }
             }
