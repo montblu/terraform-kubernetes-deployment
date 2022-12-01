@@ -20,6 +20,12 @@ variable "ecr_create" {
   description = "Controls if ECR repo should be created."
 }
 
+variable "ecr_encryption_type" {
+  type        = string
+  default     = "KMS"
+  description = "The encryption type for the repository. Must be one of: `KMS` or `AES256`."
+}
+
 variable "ecr_scan_on_push" {
   type        = bool
   default     = true
