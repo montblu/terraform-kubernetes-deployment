@@ -136,6 +136,12 @@ variable "svc_monitor_path" {
   description = "Controls where the ServiceMonitor should scrape from."
 }
 
+variable "volume" {
+  type        = map(any)
+  default     = {}
+  description = "List of volumes that can be mounted by containers belonging to the pod."
+}
+
 variable "volume_mount" {
   type        = map(any)
   default     = {}
