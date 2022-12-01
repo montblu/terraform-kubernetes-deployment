@@ -23,7 +23,8 @@ resource "kubernetes_deployment" "main" {
         volume {}
 
         container {
-          args = var.args
+          args    = var.args
+          command = var.command
           dynamic "env" {
             for_each = var.envs
             content {
@@ -32,7 +33,6 @@ resource "kubernetes_deployment" "main" {
               value_from = lookup(env.value, "value_from", "")
             }
           }
-          command           = var.command
           name              = local.resource_name
           image             = local.image
           image_pull_policy = var.image_pull_policy
