@@ -43,13 +43,13 @@ variable "command" {
   description = "Entrypoint list of the image."
 }
 
-variable "envs" {
+variable "env" {
   type        = any
   default     = {}
   description = "Block of string name and value pairs to set in the container's environment."
 }
 
-variable "envs_from" {
+variable "env_from" {
   type        = any
   default     = {}
   description = "List of sources to populate environment variables in the container."
