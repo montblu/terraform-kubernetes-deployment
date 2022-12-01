@@ -20,7 +20,67 @@ resource "kubernetes_deployment" "main" {
       }
 
       spec {
-        volume {}
+        dynamic "volume" {
+          for_each = var.volume
+          content {
+            dynamic "aws_elastic_block_store" {
+              for_each = lookup(volume.value, "aws_elastic_block_store", [])
+              content {
+                fs_type   = lookup(aws_elastic_block_store.value, "fs_type", null)
+                partition = lookup(aws_elastic_block_store.value, "partition", null)
+                read_only = lookup(aws_elastic_block_store.value, "read_only", null)
+                volume_id = lookup(aws_elastic_block_store.value, "volume_id", null)
+              }
+            }
+            dynamic "config_map" {
+              for_each = lookup(volume.value, "config_map", [])
+              content {
+                default_mode = lookup(config_map.value, "default_mode", null)
+                dynamic "items" {
+                  for_each = lookup(config_map.value, "items", [])
+                  content {
+                    key  = lookup(items.value, "key", null)
+                    mode = lookup(items.value, "mode", null)
+                    path = lookup(items.value, "path", null)
+                  }
+                }
+                optional = lookup(config_map.value, "optional", null)
+                name     = lookup(config_map.value, "name", null)
+              }
+            }
+            dynamic "empty_dir" {
+              for_each = lookup(volume.value, "empty_dir", [])
+              content {
+                medium     = lookup(empty_dir.value, "medium", null)
+                size_limit = lookup(empty_dir.value, "size_limit", null)
+              }
+            }
+            name = lookup(volume.value, "name", [])
+            dynamic "persistent_volume_claim" {
+              for_each = lookup(volume.value, "persistent_volume_claim", [])
+              content {
+                claim_name = lookup(persistent_volume_claim.value, "claim_name", null)
+                read_only  = lookup(persistent_volume_claim.value, "read_only", null)
+              }
+            }
+            dynamic "secret" {
+              for_each = lookup(volume.value, "secret", [])
+              content {
+                default_mode = lookup(secret.value, "default_mode", null)
+                dynamic "items" {
+                  for_each = lookup(config_map.value, "items", [])
+                  content {
+                    key  = lookup(items.value, "key", null)
+                    mode = lookup(items.value, "mode", null)
+                    path = lookup(items.value, "path", null)
+                  }
+                }
+                optional    = lookup(secret.value, "optional", null)
+                secret_name = lookup(secret.value, "secret_name", null)
+              }
+            }
+          }
+        }
 
         container {
           args    = var.args
