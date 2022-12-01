@@ -94,6 +94,16 @@ resource "kubernetes_deployment" "main" {
               timeout_seconds = lookup(liveness_probe.value, "timeout_seconds", null)
             }
           }
+          dynamic "volume_mount" {
+            for_each = var.volume_mount
+            content {
+              mount_path        = lookup(volume_mount.value, "mount_path", null)
+              name              = lookup(volume_mount.value, "name", null)
+              read_only         = lookup(volume_mount.value, "read_only", null)
+              sub_path          = lookup(volume_mount.value, "sub_path", null)
+              mount_propagation = lookup(volume_mount.value, "mount_propagation", null)
+            }
+          }
           working_dir = var.working_dir
 
           resources {
