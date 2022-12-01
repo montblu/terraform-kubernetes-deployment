@@ -136,6 +136,12 @@ variable "svc_monitor_path" {
   description = "Controls where the ServiceMonitor should scrape from."
 }
 
+variable "volume_mount" {
+  type        = map(any)
+  default     = {}
+  description = "Path within the container at which the volume should be mounted. Must not contain ':'."
+}
+
 variable "wait_for_rollout" {
   type        = bool
   default     = false
