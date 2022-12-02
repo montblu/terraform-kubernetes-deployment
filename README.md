@@ -57,7 +57,7 @@ No modules.
 | <a name="input_svc_monitor_create"></a> [svc\_monitor\_create](#input\_svc\_monitor\_create) | Controls whether a ServiceMonitor should be created. The `svc_create` is required to be enabled. | `bool` | `false` | no |
 | <a name="input_svc_monitor_path"></a> [svc\_monitor\_path](#input\_svc\_monitor\_path) | Controls where the ServiceMonitor should scrape from. | `string` | `"/metrics"` | no |
 | <a name="input_svc_port"></a> [svc\_port](#input\_svc\_port) | The port on the service that is hosting the service. | `number` | n/a | yes |
-| <a name="input_svc_protocol"></a> [svc\_protocol](#input\_svc\_protocol) | The protocol that the port of the service has. | `string` | n/a | yes |
+| <a name="input_svc_protocol"></a> [svc\_protocol](#input\_svc\_protocol) | The protocol that the port of the service has. | `string` | `"TCP"` | no |
 | <a name="input_svc_type"></a> [svc\_type](#input\_svc\_type) | Controls the type of the service created. | `string` | `"ClusterIP"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | `{}` | no |
 | <a name="input_volume"></a> [volume](#input\_volume) | List of volumes that can be mounted by containers belonging to the pod. | `map(any)` | `{}` | no |
