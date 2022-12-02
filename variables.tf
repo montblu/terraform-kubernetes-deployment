@@ -8,6 +8,12 @@ variable "name_prefix" {
   description = "Prefix that is going to be added to deployment name."
 }
 
+variable "affinity" {
+  type        = map(any)
+  default     = {}
+  description = "A group of affinity scheduling rules. If specified, the pod will be dispatched by specified scheduler. If not specified, the pod will be dispatched by default scheduler."
+}
+
 variable "args" {
   type        = list(string)
   default     = []
