@@ -121,6 +121,7 @@ variable "svc_port" {
 
 variable "svc_protocol" {
   type        = string
+  default     = "TCP"
   description = "The protocol that the port of the service has."
 }
 
