@@ -86,6 +86,189 @@ resource "kubernetes_deployment" "main" {
       }
 
       spec {
+
+        dynamic "affinity" {
+          for_each = var.affinity
+          content {
+            dynamic "node_affinity" {
+              for_each = lookup(affinity.value, "node_affinity", [])
+              content {
+                dynamic "required_during_scheduling_ignored_during_execution" {
+                  for_each = lookup(node_affinity.value, "required_during_scheduling_ignored_during_execution", [])
+                  content {
+                    dynamic "node_selector_term" {
+                      for_each = lookup(required_during_scheduling_ignored_during_execution.value, "node_selector_term", [])
+                      content {
+                        dynamic "match_expressions" {
+                          for_each = lookup(node_selector_term.value, "match_expressions", [])
+                          content {
+                            key      = lookup(match_expressions.value, "key", null)
+                            operator = lookup(match_expressions.value, "operator", null)
+                            values   = lookup(match_expressions.value, "values", null)
+                          }
+                        }
+                        dynamic "match_fields" {
+                          for_each = lookup(node_selector_term.value, "match_fields", [])
+                          content {
+                            key      = lookup(match_fields.value, "key", null)
+                            operator = lookup(match_fields.value, "operator", null)
+                            values   = lookup(match_fields.value, "values", null)
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                dynamic "preferred_during_scheduling_ignored_during_execution" {
+                  for_each = lookup(node_affinity.value, "preferred_during_scheduling_ignored_during_execution", [])
+                  content {
+                    dynamic "preference" {
+                      for_each = lookup(preferred_during_scheduling_ignored_during_execution.value, "preference", [])
+                      content {
+                        dynamic "match_expressions" {
+                          for_each = lookup(preference.value, "match_expressions", [])
+                          content {
+                            key      = lookup(match_expressions.value, "key", null)
+                            operator = lookup(match_expressions.value, "operator", null)
+                            values   = lookup(match_expressions.value, "values", null)
+                          }
+                        }
+                        dynamic "match_fields" {
+                          for_each = lookup(preference.value, "match_fields", [])
+                          content {
+                            key      = lookup(match_fields.value, "key", null)
+                            operator = lookup(match_fields.value, "operator", null)
+                            values   = lookup(match_fields.value, "values", null)
+                          }
+                        }
+                      }
+                    }
+
+                    weight = lookup(preferred_during_scheduling_ignored_during_execution.value, "weight", null)
+                  }
+                }
+              }
+            }
+            dynamic "pod_affinity" {
+              for_each = lookup(affinity.value, "pod_affinity", [])
+              content {
+                dynamic "required_during_scheduling_ignored_during_execution" {
+                  for_each = lookup(pod_affinity.value, "required_during_scheduling_ignored_during_execution", [])
+                  content {
+                    dynamic "node_selector_term" {
+                      for_each = lookup(required_during_scheduling_ignored_during_execution.value, "node_selector_term", [])
+                      content {
+                        dynamic "match_expressions" {
+                          for_each = lookup(node_selector_term.value, "match_expressions", [])
+                          content {
+                            key      = lookup(match_expressions.value, "key", null)
+                            operator = lookup(match_expressions.value, "operator", null)
+                            values   = lookup(match_expressions.value, "values", null)
+                          }
+                        }
+                        dynamic "match_fields" {
+                          for_each = lookup(node_selector_term.value, "match_fields", [])
+                          content {
+                            key      = lookup(match_fields.value, "key", null)
+                            operator = lookup(match_fields.value, "operator", null)
+                            values   = lookup(match_fields.value, "values", null)
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                dynamic "preferred_during_scheduling_ignored_during_execution" {
+                  for_each = lookup(pod_affinity.value, "preferred_during_scheduling_ignored_during_execution", [])
+                  content {
+                    dynamic "preference" {
+                      for_each = lookup(preferred_during_scheduling_ignored_during_execution.value, "preference", [])
+                      content {
+                        dynamic "match_expressions" {
+                          for_each = lookup(preference.value, "match_expressions", [])
+                          content {
+                            key      = lookup(match_expressions.value, "key", null)
+                            operator = lookup(match_expressions.value, "operator", null)
+                            values   = lookup(match_expressions.value, "values", null)
+                          }
+                        }
+                        dynamic "match_fields" {
+                          for_each = lookup(preference.value, "match_fields", [])
+                          content {
+                            key      = lookup(match_fields.value, "key", null)
+                            operator = lookup(match_fields.value, "operator", null)
+                            values   = lookup(match_fields.value, "values", null)
+                          }
+                        }
+                      }
+                    }
+
+                    weight = lookup(preferred_during_scheduling_ignored_during_execution.value, "weight", null)
+                  }
+                }
+              }
+            }
+            dynamic "pod_anti_affinity" {
+              for_each = lookup(affinity.value, "pod_anti_affinity", [])
+              content {
+                dynamic "required_during_scheduling_ignored_during_execution" {
+                  for_each = lookup(pod_anti_affinity.value, "required_during_scheduling_ignored_during_execution", [])
+                  content {
+                    dynamic "node_selector_term" {
+                      for_each = lookup(required_during_scheduling_ignored_during_execution.value, "node_selector_term", [])
+                      content {
+                        dynamic "match_expressions" {
+                          for_each = lookup(node_selector_term.value, "match_expressions", [])
+                          content {
+                            key      = lookup(match_expressions.value, "key", null)
+                            operator = lookup(match_expressions.value, "operator", null)
+                            values   = lookup(match_expressions.value, "values", null)
+                          }
+                        }
+                        dynamic "match_fields" {
+                          for_each = lookup(node_selector_term.value, "match_fields", [])
+                          content {
+                            key      = lookup(match_fields.value, "key", null)
+                            operator = lookup(match_fields.value, "operator", null)
+                            values   = lookup(match_fields.value, "values", null)
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                dynamic "preferred_during_scheduling_ignored_during_execution" {
+                  for_each = lookup(pod_anti_affinity.value, "preferred_during_scheduling_ignored_during_execution", [])
+                  content {
+                    dynamic "preference" {
+                      for_each = lookup(preferred_during_scheduling_ignored_during_execution.value, "preference", [])
+                      content {
+                        dynamic "match_expressions" {
+                          for_each = lookup(preference.value, "match_expressions", [])
+                          content {
+                            key      = lookup(match_expressions.value, "key", null)
+                            operator = lookup(match_expressions.value, "operator", null)
+                            values   = lookup(match_expressions.value, "values", null)
+                          }
+                        }
+                        dynamic "match_fields" {
+                          for_each = lookup(preference.value, "match_fields", [])
+                          content {
+                            key      = lookup(match_fields.value, "key", null)
+                            operator = lookup(match_fields.value, "operator", null)
+                            values   = lookup(match_fields.value, "values", null)
+                          }
+                        }
+                      }
+                    }
+
+                    weight = lookup(preferred_during_scheduling_ignored_during_execution.value, "weight", null)
+                  }
+                }
+              }
+            }
+          }
+        }
         container {
           args    = var.args
           command = var.command
