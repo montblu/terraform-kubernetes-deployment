@@ -404,7 +404,7 @@ resource "kubernetes_deployment" "main" {
               content {
                 default_mode = lookup(secret.value, "default_mode", null)
                 dynamic "items" {
-                  for_each = lookup(config_map.value, "items", [])
+                  for_each = lookup(secret.value, "items", [])
                   content {
                     key  = lookup(items.value, "key", null)
                     mode = lookup(items.value, "mode", null)
