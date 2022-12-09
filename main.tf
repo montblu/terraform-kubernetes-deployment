@@ -273,9 +273,44 @@ resource "kubernetes_deployment" "main" {
           dynamic "env" {
             for_each = var.env
             content {
-              name       = env.value
-              value      = lookup(env.value, "value", null)
-              value_from = lookup(env.value, "value_from", null)
+              name  = env.value
+              value = lookup(env.value, "value", null)
+              dynamic "value_from" {
+                for_each = lookup(env.value, "value_from", [])
+                content {
+                  dynamic "config_map_key_ref" {
+                    for_each = lookup(value_from.value, "config_map_key_ref", [])
+                    content {
+                      key      = lookup(config_map_key_ref.value, "key", null)
+                      name     = lookup(config_map_key_ref.value, "name", null)
+                      optional = lookup(config_map_key_ref.value, "optional", null)
+                    }
+                  }
+                  dynamic "field_ref" {
+                    for_each = lookup(value_from.value, "field_ref", [])
+                    content {
+                      api_version = lookup(field_ref.value, "api_version", null)
+                      field_path  = lookup(field_ref.value, "field_path", null)
+                    }
+                  }
+                  dynamic "resource_field_ref" {
+                    for_each = lookup(value_from.value, "resource_field_ref", [])
+                    content {
+                      container_name = lookup(resource_field_ref.value, "container_name", null)
+                      resource       = lookup(resource_field_ref.value, "resource", null)
+                      divisor        = lookup(resource_field_ref.value, "divisor", null)
+                    }
+                  }
+                  dynamic "secret_key_ref" {
+                    for_each = lookup(value_from.value, "secret_key_ref", [])
+                    content {
+                      key      = lookup(secret_key_ref.value, "key", null)
+                      name     = lookup(secret_key_ref.value, "name", null)
+                      optional = lookup(secret_key_ref.value, "optional", null)
+                    }
+                  }
+                }
+              }
             }
           }
           dynamic "env_from" {
