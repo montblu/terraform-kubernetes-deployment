@@ -137,9 +137,21 @@ resource "kubernetes_deployment" "main" {
                 dynamic "required_during_scheduling_ignored_during_execution" {
                   for_each = lookup(pod_affinity.value, "required_during_scheduling_ignored_during_execution", [])
                   content {
-                    label_selector = lookup(required_during_scheduling_ignored_during_execution.value, "label_selector", null)
-                    namespaces     = lookup(required_during_scheduling_ignored_during_execution.value, "namespaces", null)
-                    topology_key   = lookup(required_during_scheduling_ignored_during_execution.value, "topology_key", null)
+                    dynamic "label_selector" {
+                      for_each = lookup(required_during_scheduling_ignored_during_execution.value, "label_selector", [])
+                      content {
+                        dynamic "match_expressions" {
+                          for_each = lookup(label_selector.value, "match_expressions", [])
+                          content {
+                            key      = lookup(match_expressions.value, "key", null)
+                            operator = lookup(match_expressions.value, "operator", null)
+                            values   = lookup(match_expressions.value, "values", null)
+                          }
+                        }
+                      }
+                    }
+                    namespaces   = lookup(required_during_scheduling_ignored_during_execution.value, "namespaces", null)
+                    topology_key = lookup(required_during_scheduling_ignored_during_execution.value, "topology_key", null)
                   }
                 }
                 dynamic "preferred_during_scheduling_ignored_during_execution" {
@@ -157,9 +169,21 @@ resource "kubernetes_deployment" "main" {
                 dynamic "required_during_scheduling_ignored_during_execution" {
                   for_each = lookup(pod_anti_affinity.value, "required_during_scheduling_ignored_during_execution", [])
                   content {
-                    label_selector = lookup(required_during_scheduling_ignored_during_execution.value, "label_selector", null)
-                    namespaces     = lookup(required_during_scheduling_ignored_during_execution.value, "namespaces", null)
-                    topology_key   = lookup(required_during_scheduling_ignored_during_execution.value, "topology_key", null)
+                    dynamic "label_selector" {
+                      for_each = lookup(required_during_scheduling_ignored_during_execution.value, "label_selector", [])
+                      content {
+                        dynamic "match_expressions" {
+                          for_each = lookup(label_selector.value, "match_expressions", [])
+                          content {
+                            key      = lookup(match_expressions.value, "key", null)
+                            operator = lookup(match_expressions.value, "operator", null)
+                            values   = lookup(match_expressions.value, "values", null)
+                          }
+                        }
+                      }
+                    }
+                    namespaces   = lookup(required_during_scheduling_ignored_during_execution.value, "namespaces", null)
+                    topology_key = lookup(required_during_scheduling_ignored_during_execution.value, "topology_key", null)
                   }
                 }
                 dynamic "preferred_during_scheduling_ignored_during_execution" {
