@@ -105,14 +105,6 @@ resource "kubernetes_deployment" "main" {
                             values   = lookup(match_expressions.value, "values", null)
                           }
                         }
-                        dynamic "match_fields" {
-                          for_each = lookup(node_selector_term.value, "match_fields", [])
-                          content {
-                            key      = lookup(match_fields.value, "key", null)
-                            operator = lookup(match_fields.value, "operator", null)
-                            values   = lookup(match_fields.value, "values", null)
-                          }
-                        }
                       }
                     }
                   }
@@ -129,14 +121,6 @@ resource "kubernetes_deployment" "main" {
                             key      = lookup(match_expressions.value, "key", null)
                             operator = lookup(match_expressions.value, "operator", null)
                             values   = lookup(match_expressions.value, "values", null)
-                          }
-                        }
-                        dynamic "match_fields" {
-                          for_each = lookup(preference.value, "match_fields", [])
-                          content {
-                            key      = lookup(match_fields.value, "key", null)
-                            operator = lookup(match_fields.value, "operator", null)
-                            values   = lookup(match_fields.value, "values", null)
                           }
                         }
                       }
