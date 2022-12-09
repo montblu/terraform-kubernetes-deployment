@@ -137,55 +137,16 @@ resource "kubernetes_deployment" "main" {
                 dynamic "required_during_scheduling_ignored_during_execution" {
                   for_each = lookup(pod_affinity.value, "required_during_scheduling_ignored_during_execution", [])
                   content {
-                    dynamic "node_selector_term" {
-                      for_each = lookup(required_during_scheduling_ignored_during_execution.value, "node_selector_term", [])
-                      content {
-                        dynamic "match_expressions" {
-                          for_each = lookup(node_selector_term.value, "match_expressions", [])
-                          content {
-                            key      = lookup(match_expressions.value, "key", null)
-                            operator = lookup(match_expressions.value, "operator", null)
-                            values   = lookup(match_expressions.value, "values", null)
-                          }
-                        }
-                        dynamic "match_fields" {
-                          for_each = lookup(node_selector_term.value, "match_fields", [])
-                          content {
-                            key      = lookup(match_fields.value, "key", null)
-                            operator = lookup(match_fields.value, "operator", null)
-                            values   = lookup(match_fields.value, "values", null)
-                          }
-                        }
-                      }
-                    }
+                    label_selector = lookup(required_during_scheduling_ignored_during_execution.value, "label_selector", null)
+                    namespaces     = lookup(required_during_scheduling_ignored_during_execution.value, "namespaces", null)
+                    topology_key   = lookup(required_during_scheduling_ignored_during_execution.value, "topology_key", null)
                   }
                 }
                 dynamic "preferred_during_scheduling_ignored_during_execution" {
                   for_each = lookup(pod_affinity.value, "preferred_during_scheduling_ignored_during_execution", [])
                   content {
-                    dynamic "preference" {
-                      for_each = lookup(preferred_during_scheduling_ignored_during_execution.value, "preference", [])
-                      content {
-                        dynamic "match_expressions" {
-                          for_each = lookup(preference.value, "match_expressions", [])
-                          content {
-                            key      = lookup(match_expressions.value, "key", null)
-                            operator = lookup(match_expressions.value, "operator", null)
-                            values   = lookup(match_expressions.value, "values", null)
-                          }
-                        }
-                        dynamic "match_fields" {
-                          for_each = lookup(preference.value, "match_fields", [])
-                          content {
-                            key      = lookup(match_fields.value, "key", null)
-                            operator = lookup(match_fields.value, "operator", null)
-                            values   = lookup(match_fields.value, "values", null)
-                          }
-                        }
-                      }
-                    }
-
-                    weight = lookup(preferred_during_scheduling_ignored_during_execution.value, "weight", null)
+                    pod_affinity_term = lookup(preferred_during_scheduling_ignored_during_execution.value, "pod_affinity_term", null)
+                    weight            = lookup(preferred_during_scheduling_ignored_during_execution.value, "weight", null)
                   }
                 }
               }
@@ -196,55 +157,16 @@ resource "kubernetes_deployment" "main" {
                 dynamic "required_during_scheduling_ignored_during_execution" {
                   for_each = lookup(pod_anti_affinity.value, "required_during_scheduling_ignored_during_execution", [])
                   content {
-                    dynamic "node_selector_term" {
-                      for_each = lookup(required_during_scheduling_ignored_during_execution.value, "node_selector_term", [])
-                      content {
-                        dynamic "match_expressions" {
-                          for_each = lookup(node_selector_term.value, "match_expressions", [])
-                          content {
-                            key      = lookup(match_expressions.value, "key", null)
-                            operator = lookup(match_expressions.value, "operator", null)
-                            values   = lookup(match_expressions.value, "values", null)
-                          }
-                        }
-                        dynamic "match_fields" {
-                          for_each = lookup(node_selector_term.value, "match_fields", [])
-                          content {
-                            key      = lookup(match_fields.value, "key", null)
-                            operator = lookup(match_fields.value, "operator", null)
-                            values   = lookup(match_fields.value, "values", null)
-                          }
-                        }
-                      }
-                    }
+                    label_selector = lookup(required_during_scheduling_ignored_during_execution.value, "label_selector", null)
+                    namespaces     = lookup(required_during_scheduling_ignored_during_execution.value, "namespaces", null)
+                    topology_key   = lookup(required_during_scheduling_ignored_during_execution.value, "topology_key", null)
                   }
                 }
                 dynamic "preferred_during_scheduling_ignored_during_execution" {
                   for_each = lookup(pod_anti_affinity.value, "preferred_during_scheduling_ignored_during_execution", [])
                   content {
-                    dynamic "preference" {
-                      for_each = lookup(preferred_during_scheduling_ignored_during_execution.value, "preference", [])
-                      content {
-                        dynamic "match_expressions" {
-                          for_each = lookup(preference.value, "match_expressions", [])
-                          content {
-                            key      = lookup(match_expressions.value, "key", null)
-                            operator = lookup(match_expressions.value, "operator", null)
-                            values   = lookup(match_expressions.value, "values", null)
-                          }
-                        }
-                        dynamic "match_fields" {
-                          for_each = lookup(preference.value, "match_fields", [])
-                          content {
-                            key      = lookup(match_fields.value, "key", null)
-                            operator = lookup(match_fields.value, "operator", null)
-                            values   = lookup(match_fields.value, "values", null)
-                          }
-                        }
-                      }
-                    }
-
-                    weight = lookup(preferred_during_scheduling_ignored_during_execution.value, "weight", null)
+                    pod_affinity_term = lookup(preferred_during_scheduling_ignored_during_execution.value, "pod_affinity_term", null)
+                    weight            = lookup(preferred_during_scheduling_ignored_during_execution.value, "weight", null)
                   }
                 }
               }
