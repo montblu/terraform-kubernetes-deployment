@@ -114,6 +114,12 @@ variable "resource_requests" {
   description = "Describes the minimum amount of compute resources required."
 }
 
+variable "svc_annotations" {
+  type        = map(any)
+  default     = {}
+  description = "Map of annotations to add to the Service."
+}
+
 variable "svc_create" {
   type        = bool
   default     = true
