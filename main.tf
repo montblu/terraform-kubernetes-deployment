@@ -9,6 +9,8 @@ locals {
   labels = merge(local.default_labels, var.labels)
 
   image = var.image == "" ? (var.ecr_create ? aws_ecr_repository.main[0].repository_url : "dummy") : var.image
+
+  svc_labels = merge(local.default_labels, var.svc_labels)
 }
 
 
@@ -445,8 +447,9 @@ resource "kubernetes_service" "main" {
   count = var.svc_create ? 1 : 0
 
   metadata {
-    name      = local.resource_name
-    namespace = var.namespace
+    annotations = var.svc_annotations
+    name        = local.resource_name
+    namespace   = var.namespace
 
     labels = {
       app = local.resource_name
