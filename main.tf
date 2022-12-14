@@ -451,9 +451,7 @@ resource "kubernetes_service" "main" {
     name        = local.resource_name
     namespace   = var.namespace
 
-    labels = {
-      app = local.resource_name
-    }
+    labels = local.svc_labels
   }
 
   spec {
