@@ -126,6 +126,12 @@ variable "svc_create" {
   description = "Controls if a service should be created for the deployment."
 }
 
+variable "svc_labels" {
+  type        = map(any)
+  default     = {}
+  description = "Map of string keys and values that can be used to organize and categorize (scope and select) the service."
+}
+
 variable "svc_port" {
   type        = number
   description = "The port on the service that is hosting the service."
