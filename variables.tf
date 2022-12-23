@@ -9,8 +9,8 @@ variable "name_prefix" {
 }
 
 variable "affinity" {
-  type        = map(any)
-  default     = {}
+  type        = list(any)
+  default     = []
   description = "A group of affinity scheduling rules. If specified, the pod will be dispatched by specified scheduler. If not specified, the pod will be dispatched by default scheduler."
 }
 
@@ -45,8 +45,8 @@ variable "ecr_number_of_images_to_keep" {
 }
 
 variable "annotations" {
-  type        = map(any)
-  default     = {}
+  type        = list(any)
+  default     = []
   description = "Map of annotations to add to the Deployment."
 }
 variable "command" {
@@ -56,14 +56,14 @@ variable "command" {
 }
 
 variable "env" {
-  type        = any
-  default     = {}
+  type        = list(any)
+  default     = []
   description = "Block of string name and value pairs to set in the container's environment."
 }
 
 variable "env_from" {
-  type        = any
-  default     = {}
+  type        = list(any)
+  default     = []
   description = "List of sources to populate environment variables in the container."
 }
 
@@ -86,8 +86,8 @@ variable "labels" {
 }
 
 variable "liveness_probe" {
-  type        = map(any)
-  default     = {}
+  type        = list(any)
+  default     = []
   description = "Periodic probe of container liveness. Container will be restarted if the probe fails."
 }
 
@@ -103,14 +103,14 @@ variable "replicas" {
 }
 
 variable "resource_limits" {
-  type        = map(any)
-  default     = {}
+  type        = list(any)
+  default     = []
   description = "Describes the maximum amount of compute resources allowed."
 }
 
 variable "resource_requests" {
-  type        = map(any)
-  default     = {}
+  type        = list(any)
+  default     = []
   description = "Describes the minimum amount of compute resources required."
 }
 
@@ -168,14 +168,14 @@ variable "tags" {
 }
 
 variable "volume" {
-  type        = map(any)
-  default     = {}
+  type        = list(any)
+  default     = []
   description = "List of volumes that can be mounted by containers belonging to the pod."
 }
 
 variable "volume_mount" {
-  type        = map(any)
-  default     = {}
+  type        = list(any)
+  default     = []
   description = "Path within the container at which the volume should be mounted. Must not contain ':'."
 }
 
