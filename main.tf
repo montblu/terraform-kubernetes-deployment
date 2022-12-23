@@ -315,7 +315,7 @@ resource "kubernetes_deployment" "main" {
                   command = lookup(exec.value, "name", null)
                 }
               }
-              failure_threshold = lookup(liveness_probe.value, "failure_threshold", [])
+              failure_threshold = lookup(liveness_probe.value, "failure_threshold", null)
               dynamic "http_get" {
                 for_each = lookup(liveness_probe.value, "http_get", [])
                 content {
