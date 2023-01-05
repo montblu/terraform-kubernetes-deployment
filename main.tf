@@ -11,6 +11,12 @@ locals {
   image = var.image == "" ? (var.ecr_create ? aws_ecr_repository.main[0].repository_url : "dummy") : var.image
 
   svc_labels = merge(local.default_labels, var.svc_labels)
+
+  container = {
+
+  }
+
+  containers = concat(additional_containers, container)
 }
 
 
