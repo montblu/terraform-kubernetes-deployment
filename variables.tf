@@ -8,6 +8,12 @@ variable "name_prefix" {
   description = "Prefix that is going to be added to deployment name."
 }
 
+variable "additional_containers" {
+  type        = list(any)
+  default     = []
+  description = "List of containers belonging to the pod."
+}
+
 variable "affinity" {
   type        = list(any)
   default     = []
