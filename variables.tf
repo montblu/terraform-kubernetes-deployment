@@ -44,6 +44,12 @@ variable "ecr_number_of_images_to_keep" {
   description = "Controls how many images should be kept in the ECR repo."
 }
 
+variable "init_container" {
+  type        = list(any)
+  default     = []
+  description = "List of init containers belonging to the pod. Init containers always run to completion and each must complete successfully before the next is started."
+}
+
 variable "annotations" {
   type        = map(string)
   default     = {}
