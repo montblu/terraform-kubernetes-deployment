@@ -45,8 +45,8 @@ variable "ecr_number_of_images_to_keep" {
 }
 
 variable "annotations" {
-  type        = list(any)
-  default     = []
+  type        = map(string)
+  default     = {}
   description = "Map of annotations to add to the Deployment."
 }
 variable "command" {
@@ -103,14 +103,14 @@ variable "replicas" {
 }
 
 variable "resource_limits" {
-  type        = list(any)
-  default     = []
+  type        = map(string)
+  default     = {}
   description = "Describes the maximum amount of compute resources allowed."
 }
 
 variable "resource_requests" {
-  type        = list(any)
-  default     = []
+  type        = map(string)
+  default     = {}
   description = "Describes the minimum amount of compute resources required."
 }
 
