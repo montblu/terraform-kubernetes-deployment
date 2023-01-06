@@ -34,6 +34,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_additional_containers"></a> [additional\_containers](#input\_additional\_containers) | List of containers belonging to the pod. | `list(any)` | `[]` | no |
 | <a name="input_affinity"></a> [affinity](#input\_affinity) | A group of affinity scheduling rules. If specified, the pod will be dispatched by specified scheduler. If not specified, the pod will be dispatched by default scheduler. | `list(any)` | `[]` | no |
 | <a name="input_annotations"></a> [annotations](#input\_annotations) | Map of annotations to add to the Deployment. | `map(string)` | `{}` | no |
 | <a name="input_args"></a> [args](#input\_args) | Arguments to the entrypoint. | `list(string)` | `[]` | no |
@@ -46,6 +47,7 @@ No modules.
 | <a name="input_env_from"></a> [env\_from](#input\_env\_from) | List of sources to populate environment variables in the container. | `list(any)` | `[]` | no |
 | <a name="input_image"></a> [image](#input\_image) | Docker image name. | `string` | `""` | no |
 | <a name="input_image_pull_policy"></a> [image\_pull\_policy](#input\_image\_pull\_policy) | Image pull policy. One of Always, Never, IfNotPresent. | `string` | `"IfNotPresent"` | no |
+| <a name="input_init_container"></a> [init\_container](#input\_init\_container) | List of init containers belonging to the pod. Init containers always run to completion and each must complete successfully before the next is started. | `list(any)` | `[]` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of string keys and values that can be used to organize and categorize (scope and select) the deployment. | `map(any)` | `{}` | no |
 | <a name="input_liveness_probe"></a> [liveness\_probe](#input\_liveness\_probe) | Periodic probe of container liveness. Container will be restarted if the probe fails. | `list(any)` | `[]` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the deployment. | `string` | n/a | yes |
