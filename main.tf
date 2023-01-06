@@ -392,10 +392,10 @@ resource "kubernetes_deployment" "main" {
         dynamic "container" {
           for_each = local.containers
           content {
-            args    = lookup(init_container.value, "args", null)
-            command = lookup(init_container.value, "command", null)
+            args    = lookup(container.value, "args", null)
+            command = lookup(container.value, "command", null)
             dynamic "env" {
-              for_each = lookup(init_container.value, "env", [])
+              for_each = lookup(container.value, "env", [])
               content {
                 name  = lookup(env.value, "name", null)
                 value = lookup(env.value, "value", null)
@@ -438,7 +438,7 @@ resource "kubernetes_deployment" "main" {
               }
             }
             dynamic "env_from" {
-              for_each = lookup(init_container.value, "env_from", [])
+              for_each = lookup(container.value, "env_from", [])
               content {
                 dynamic "config_map_ref" {
                   for_each = lookup(env_from.value, "config_map_ref", [])
@@ -457,11 +457,11 @@ resource "kubernetes_deployment" "main" {
                 }
               }
             }
-            name              = lookup(init_container.value, "name", [])
-            image             = lookup(init_container.value, "image", [])
-            image_pull_policy = lookup(init_container.value, "image_pull_policy", [])
+            name              = lookup(container.value, "name", [])
+            image             = lookup(container.value, "image", [])
+            image_pull_policy = lookup(container.value, "image_pull_policy", [])
             dynamic "liveness_probe" {
-              for_each = lookup(init_container.value, "liveness_probe", [])
+              for_each = lookup(container.value, "liveness_probe", [])
               content {
                 dynamic "exec" {
                   for_each = lookup(liveness_probe.value, "exec", [])
@@ -499,7 +499,7 @@ resource "kubernetes_deployment" "main" {
               }
             }
             dynamic "volume_mount" {
-              for_each = lookup(init_container.value, "volume_mount", [])
+              for_each = lookup(container.value, "volume_mount", [])
               content {
                 mount_path        = lookup(volume_mount.value, "mount_path", null)
                 name              = lookup(volume_mount.value, "name", null)
@@ -509,10 +509,10 @@ resource "kubernetes_deployment" "main" {
               }
             }
 
-            working_dir = lookup(init_container.value, "working_dir", [])
+            working_dir = lookup(container.value, "working_dir", [])
 
             dynamic "resources" {
-              for_each = lookup(init_container.value, "resources", [])
+              for_each = lookup(container.value, "resources", [])
               content {
                 limits   = lookup(resources.value, "limits", {})
                 requests = lookup(resources.value, "requests", {})
