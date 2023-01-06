@@ -13,7 +13,22 @@ locals {
   svc_labels = merge(local.default_labels, var.svc_labels)
 
   container = {
-
+    args              = var.args
+    command           = var.command
+    env               = var.env
+    env_from          = var.env_from
+    name              = local.resource_name
+    image             = local.image
+    image_pull_policy = var.image_pull_policy
+    liveness_probe    = var.liveness_probe
+    volume_mount      = var.volume_mount
+    working_dir       = var.working_dir
+    resources = [
+      {
+        limits   = var.resource_limits
+        requests = var.resource_requests
+      }
+    ]
   }
 
   containers = concat([container], additional_containers)
