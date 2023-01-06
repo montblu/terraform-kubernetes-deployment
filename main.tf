@@ -16,7 +16,7 @@ locals {
 
   }
 
-  containers = concat(additional_containers, container)
+  containers = concat([container], additional_containers)
 }
 
 
