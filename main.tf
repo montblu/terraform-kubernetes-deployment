@@ -31,7 +31,7 @@ locals {
     ]
   }
 
-  containers = concat([container], additional_containers)
+  containers = concat([local.container], var.additional_containers)
 }
 
 
