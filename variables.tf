@@ -180,7 +180,7 @@ variable "tags" {
 }
 
 variable "volume" {
-  type        = list(any)
+  type        = any
   default     = []
   description = "List of volumes that can be mounted by containers belonging to the pod."
 }
