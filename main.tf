@@ -555,7 +555,7 @@ resource "kubernetes_deployment" "main" {
                 size_limit = lookup(empty_dir.value, "size_limit", null)
               }
             }
-            name = lookup(volume.value, "name", [])
+            name = lookup(volume.value, "name", null)
             dynamic "persistent_volume_claim" {
               for_each = lookup(volume.value, "persistent_volume_claim", [])
               content {
