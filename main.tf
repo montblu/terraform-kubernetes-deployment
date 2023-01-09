@@ -313,7 +313,7 @@ resource "kubernetes_deployment" "main" {
                   for_each = lookup(env_from.value, "config_map_ref", [])
                   content {
                     name     = lookup(config_map_ref.value, "name", null)
-                    optional = lookup(config_map_ref.value, "name", null)
+                    optional = lookup(config_map_ref.value, "optional", null)
                   }
                 }
                 prefix = lookup(env_from.value, "prefix", null)
@@ -321,7 +321,7 @@ resource "kubernetes_deployment" "main" {
                   for_each = lookup(env_from.value, "secret_ref", [])
                   content {
                     name     = lookup(secret_ref.value, "name", null)
-                    optional = lookup(secret_ref.value, "name", null)
+                    optional = lookup(secret_ref.value, "optional", null)
                   }
                 }
               }
@@ -444,7 +444,7 @@ resource "kubernetes_deployment" "main" {
                   for_each = lookup(env_from.value, "config_map_ref", [])
                   content {
                     name     = lookup(config_map_ref.value, "name", null)
-                    optional = lookup(config_map_ref.value, "name", null)
+                    optional = lookup(config_map_ref.value, "optional", null)
                   }
                 }
                 prefix = lookup(env_from.value, "prefix", null)
@@ -452,7 +452,7 @@ resource "kubernetes_deployment" "main" {
                   for_each = lookup(env_from.value, "secret_ref", [])
                   content {
                     name     = lookup(secret_ref.value, "name", null)
-                    optional = lookup(secret_ref.value, "name", null)
+                    optional = lookup(secret_ref.value, "optional", null)
                   }
                 }
               }
