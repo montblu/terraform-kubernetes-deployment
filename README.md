@@ -41,6 +41,7 @@ No modules.
 | <a name="input_command"></a> [command](#input\_command) | Entrypoint list of the image. | `list(string)` | `[]` | no |
 | <a name="input_ecr_create"></a> [ecr\_create](#input\_ecr\_create) | Controls if ECR repo should be created. | `bool` | `true` | no |
 | <a name="input_ecr_encryption_type"></a> [ecr\_encryption\_type](#input\_ecr\_encryption\_type) | The encryption type for the repository. Must be one of: `KMS` or `AES256`. | `string` | `"KMS"` | no |
+| <a name="input_ecr_lifecycle_policy"></a> [ecr\_lifecycle\_policy](#input\_ecr\_lifecycle\_policy) | Sets the lifecycle policy of the ECR. If set `ecr_number_of_images_to_keep` won't work. | `string` | `""` | no |
 | <a name="input_ecr_number_of_images_to_keep"></a> [ecr\_number\_of\_images\_to\_keep](#input\_ecr\_number\_of\_images\_to\_keep) | Controls how many images should be kept in the ECR repo. | `number` | `30` | no |
 | <a name="input_ecr_scan_on_push"></a> [ecr\_scan\_on\_push](#input\_ecr\_scan\_on\_push) | Controls if ECR should scan images after pushed. | `bool` | `true` | no |
 | <a name="input_env"></a> [env](#input\_env) | Block of string name and value pairs to set in the container's environment. | `list(any)` | `[]` | no |
