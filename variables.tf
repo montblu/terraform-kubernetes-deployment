@@ -74,7 +74,7 @@ variable "env" {
 }
 
 variable "env_from" {
-  type        = list(any)
+  type        = any
   default     = []
   description = "List of sources to populate environment variables in the container."
 }
