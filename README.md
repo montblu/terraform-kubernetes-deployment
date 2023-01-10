@@ -44,7 +44,7 @@ No modules.
 | <a name="input_ecr_number_of_images_to_keep"></a> [ecr\_number\_of\_images\_to\_keep](#input\_ecr\_number\_of\_images\_to\_keep) | Controls how many images should be kept in the ECR repo. | `number` | `30` | no |
 | <a name="input_ecr_scan_on_push"></a> [ecr\_scan\_on\_push](#input\_ecr\_scan\_on\_push) | Controls if ECR should scan images after pushed. | `bool` | `true` | no |
 | <a name="input_env"></a> [env](#input\_env) | Block of string name and value pairs to set in the container's environment. | `list(any)` | `[]` | no |
-| <a name="input_env_from"></a> [env\_from](#input\_env\_from) | List of sources to populate environment variables in the container. | `list(any)` | `[]` | no |
+| <a name="input_env_from"></a> [env\_from](#input\_env\_from) | List of sources to populate environment variables in the container. | `any` | `[]` | no |
 | <a name="input_image"></a> [image](#input\_image) | Docker image name. | `string` | `""` | no |
 | <a name="input_image_pull_policy"></a> [image\_pull\_policy](#input\_image\_pull\_policy) | Image pull policy. One of Always, Never, IfNotPresent. | `string` | `"IfNotPresent"` | no |
 | <a name="input_init_container"></a> [init\_container](#input\_init\_container) | List of init containers belonging to the pod. Init containers always run to completion and each must complete successfully before the next is started. | `list(any)` | `[]` | no |
@@ -65,7 +65,7 @@ No modules.
 | <a name="input_svc_protocol"></a> [svc\_protocol](#input\_svc\_protocol) | The protocol that the port of the service has. | `string` | `"TCP"` | no |
 | <a name="input_svc_type"></a> [svc\_type](#input\_svc\_type) | Controls the type of the service created. | `string` | `"ClusterIP"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | `{}` | no |
-| <a name="input_volume"></a> [volume](#input\_volume) | List of volumes that can be mounted by containers belonging to the pod. | `list(any)` | `[]` | no |
+| <a name="input_volume"></a> [volume](#input\_volume) | List of volumes that can be mounted by containers belonging to the pod. | `any` | `[]` | no |
 | <a name="input_volume_mount"></a> [volume\_mount](#input\_volume\_mount) | Path within the container at which the volume should be mounted. Must not contain ':'. | `list(any)` | `[]` | no |
 | <a name="input_wait_for_rollout"></a> [wait\_for\_rollout](#input\_wait\_for\_rollout) | Controls wheter Terraform should wait for deployment to be healthy. | `bool` | `false` | no |
 | <a name="input_working_dir"></a> [working\_dir](#input\_working\_dir) | Container's working directory. | `string` | `""` | no |
