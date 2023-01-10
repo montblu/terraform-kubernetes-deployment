@@ -1,6 +1,27 @@
 locals {
   resource_name = "${var.name_prefix}-${var.name}"
 
+  default_ecr_lifecycle_policy = <<EOF
+{
+    "rules": [
+        {
+            "rulePriority": 1,
+            "description": "Keep last ${var.ecr_number_of_images_to_keep} images",
+            "selection": {
+                "tagStatus": "any",
+                "countType": "imageCountMoreThan",
+                "countNumber": ${var.ecr_number_of_images_to_keep}
+            },
+            "action": {
+                "type": "expire"
+            }
+        }
+    ]
+}
+EOF
+
+  ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ? local.default_ecr_lifecycle_policy : var.ecr_lifecycle_policy
+
   annotations = var.annotations
   default_labels = {
     app = local.resource_name
@@ -58,24 +79,7 @@ resource "aws_ecr_lifecycle_policy" "main" {
   count = var.ecr_create ? 1 : 0
 
   repository = aws_ecr_repository.main[0].name
-  policy     = <<EOF
-{
-    "rules": [
-        {
-            "rulePriority": 1,
-            "description": "Keep last ${var.ecr_number_of_images_to_keep} images",
-            "selection": {
-                "tagStatus": "any",
-                "countType": "imageCountMoreThan",
-                "countNumber": ${var.ecr_number_of_images_to_keep}
-            },
-            "action": {
-                "type": "expire"
-            }
-        }
-    ]
-}
-EOF
+  policy     = local.ecr_lifecycle_policy
 
   depends_on = [
     aws_ecr_repository.main
