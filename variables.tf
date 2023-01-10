@@ -38,6 +38,12 @@ variable "ecr_encryption_type" {
   description = "The encryption type for the repository. Must be one of: `KMS` or `AES256`."
 }
 
+variable "ecr_lifecycle_policy" {
+  type        = string
+  default     = ""
+  description = "Sets the lifecycle policy of the ECR. If set `ecr_number_of_images_to_keep` won't work."
+}
+
 variable "ecr_scan_on_push" {
   type        = bool
   default     = true
