@@ -8,6 +8,12 @@ variable "name_prefix" {
   description = "Prefix that is going to be added to deployment name."
 }
 
+variable "additional_containers" {
+  type        = list(any)
+  default     = []
+  description = "List of containers belonging to the pod."
+}
+
 variable "affinity" {
   type        = list(any)
   default     = []
@@ -32,6 +38,12 @@ variable "ecr_encryption_type" {
   description = "The encryption type for the repository. Must be one of: `KMS` or `AES256`."
 }
 
+variable "ecr_lifecycle_policy" {
+  type        = string
+  default     = ""
+  description = "Sets the lifecycle policy of the ECR. If set `ecr_number_of_images_to_keep` won't work."
+}
+
 variable "ecr_scan_on_push" {
   type        = bool
   default     = true
@@ -44,9 +56,15 @@ variable "ecr_number_of_images_to_keep" {
   description = "Controls how many images should be kept in the ECR repo."
 }
 
-variable "annotations" {
+variable "init_container" {
   type        = list(any)
   default     = []
+  description = "List of init containers belonging to the pod. Init containers always run to completion and each must complete successfully before the next is started."
+}
+
+variable "annotations" {
+  type        = map(string)
+  default     = {}
   description = "Map of annotations to add to the Deployment."
 }
 variable "command" {
@@ -62,7 +80,7 @@ variable "env" {
 }
 
 variable "env_from" {
-  type        = list(any)
+  type        = any
   default     = []
   description = "List of sources to populate environment variables in the container."
 }
@@ -103,14 +121,14 @@ variable "replicas" {
 }
 
 variable "resource_limits" {
-  type        = list(any)
-  default     = []
+  type        = map(string)
+  default     = {}
   description = "Describes the maximum amount of compute resources allowed."
 }
 
 variable "resource_requests" {
-  type        = list(any)
-  default     = []
+  type        = map(string)
+  default     = {}
   description = "Describes the minimum amount of compute resources required."
 }
 
@@ -168,7 +186,7 @@ variable "tags" {
 }
 
 variable "volume" {
-  type        = list(any)
+  type        = any
   default     = []
   description = "List of volumes that can be mounted by containers belonging to the pod."
 }
