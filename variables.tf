@@ -109,6 +109,12 @@ variable "liveness_probe" {
   description = "Periodic probe of container liveness. Container will be restarted if the probe fails."
 }
 
+variable "readiness_probe" {
+  type        = list(any)
+  default     = []
+  description = "Periodic probe of container service readiness. Container will be removed from service endpoints if the probe fails."
+}
+
 variable "namespace" {
   type        = string
   description = "Namespace of where the deployment will be deployed."
