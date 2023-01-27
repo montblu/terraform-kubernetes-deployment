@@ -42,6 +42,7 @@ EOF
     image             = local.image
     image_pull_policy = var.image_pull_policy
     liveness_probe    = var.liveness_probe
+    readiness_probe   = var.readiness_probe
     volume_mount      = var.volume_mount
     working_dir       = var.working_dir
     resources = [
