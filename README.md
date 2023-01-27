@@ -54,6 +54,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | Name of the deployment. | `string` | n/a | yes |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | Prefix that is going to be added to deployment name. | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace of where the deployment will be deployed. | `string` | n/a | yes |
+| <a name="input_readiness_probe"></a> [readiness\_probe](#input\_readiness\_probe) | Periodic probe of container service readiness. Container will be removed from service endpoints if the probe fails. | `list(any)` | `[]` | no |
 | <a name="input_replicas"></a> [replicas](#input\_replicas) | The number of desired replicas. | `number` | `1` | no |
 | <a name="input_resource_limits"></a> [resource\_limits](#input\_resource\_limits) | Describes the maximum amount of compute resources allowed. | `map(string)` | `{}` | no |
 | <a name="input_resource_requests"></a> [resource\_requests](#input\_resource\_requests) | Describes the minimum amount of compute resources required. | `map(string)` | `{}` | no |
