@@ -87,6 +87,33 @@ resource "aws_ecr_lifecycle_policy" "main" {
   ]
 }
 
+# allow pull from all other accounts
+data "aws_iam_policy_document" "ecr_other_accounts_policy" {
+  dynamic "statement" {
+    for_each = var.allowed_aws_accounts
+    content {
+      sid    = "pull only for ${statement.key}"
+      effect = "Allow"
+      principals {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${statement.key}:root"
+        ]
+      }
+      actions = [
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "ecr:BatchCheckLayerAvailability",
+      ]
+    }
+  }
+}
+resource "aws_ecr_repository_policy" "ecr_other_accounts_policy" {
+  count      = length(var.allowed_aws_accounts) > 0 ? 1 : 0
+  repository = aws_ecr_repository.ecr_repository[0].name
+  policy     = data.aws_iam_policy_document.ecr_policy.json
+}
+
 ################################################################################
 # Kubernetes Deployment
 ################################################################################

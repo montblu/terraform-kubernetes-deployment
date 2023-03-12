@@ -20,6 +20,12 @@ variable "affinity" {
   description = "A group of affinity scheduling rules. If specified, the pod will be dispatched by specified scheduler. If not specified, the pod will be dispatched by default scheduler."
 }
 
+variable "allowed_aws_accounts" {
+  type        = list(string)
+  default     = []
+  description = "AWS accounts allowed to pull from the created ECR"
+}
+
 variable "args" {
   type        = list(string)
   default     = []
