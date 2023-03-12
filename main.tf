@@ -92,12 +92,12 @@ data "aws_iam_policy_document" "main" {
   dynamic "statement" {
     for_each = var.allowed_aws_accounts
     content {
-      sid    = "Pull"
+      sid    = "Pull only for ${statement.value}"
       effect = "Allow"
       principals {
         type = "AWS"
         identifiers = [
-          "arn:aws:iam::${statement.key}:root"
+          "arn:aws:iam::${statement.value}:root"
         ]
       }
       actions = [
