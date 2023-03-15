@@ -162,6 +162,12 @@ variable "svc_labels" {
   description = "Map of string keys and values that can be used to organize and categorize (scope and select) the service."
 }
 
+variable "svc_load_balancer_class" {
+  type        = string
+  default     = ""
+  description = "The class of the load balancer implementation this Service belongs to. If specified, the value of this field must be a label-style identifier, with an optional prefix. This field can only be set when the Service type is LoadBalancer. If not set, the default load balancer implementation is used."
+}
+
 variable "svc_port" {
   type        = number
   description = "The port on the service that is hosting the service."
