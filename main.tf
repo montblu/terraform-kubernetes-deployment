@@ -89,6 +89,8 @@ resource "aws_ecr_lifecycle_policy" "main" {
 
 # allow pull from all other accounts
 data "aws_iam_policy_document" "main" {
+  count = var.ecr_create ? 1 : 0
+
   dynamic "statement" {
     for_each = var.allowed_aws_accounts
     content {
