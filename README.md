@@ -64,6 +64,7 @@ No modules.
 | <a name="input_svc_annotations"></a> [svc\_annotations](#input\_svc\_annotations) | Map of annotations to add to the Service. | `map(any)` | `{}` | no |
 | <a name="input_svc_create"></a> [svc\_create](#input\_svc\_create) | Controls if a service should be created for the deployment. | `bool` | `true` | no |
 | <a name="input_svc_labels"></a> [svc\_labels](#input\_svc\_labels) | Map of string keys and values that can be used to organize and categorize (scope and select) the service. | `map(any)` | `{}` | no |
+| <a name="input_svc_load_balancer_class"></a> [svc\_load\_balancer\_class](#input\_svc\_load\_balancer\_class) | The class of the load balancer implementation this Service belongs to. If specified, the value of this field must be a label-style identifier, with an optional prefix. This field can only be set when the Service type is LoadBalancer. If not set, the default load balancer implementation is used. | `string` | `""` | no |
 | <a name="input_svc_monitor_create"></a> [svc\_monitor\_create](#input\_svc\_monitor\_create) | Controls whether a ServiceMonitor should be created. The `svc_create` is required to be enabled. | `bool` | `false` | no |
 | <a name="input_svc_monitor_path"></a> [svc\_monitor\_path](#input\_svc\_monitor\_path) | Controls where the ServiceMonitor should scrape from. | `string` | `"/metrics"` | no |
 | <a name="input_svc_port"></a> [svc\_port](#input\_svc\_port) | The port on the service that is hosting the service. | `number` | n/a | yes |
