@@ -38,10 +38,10 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_additional_containers"></a> [additional\_containers](#input\_additional\_containers) | List of containers belonging to the pod. | `list(any)` | `[]` | no |
 | <a name="input_affinity"></a> [affinity](#input\_affinity) | A group of affinity scheduling rules. If specified, the pod will be dispatched by specified scheduler. If not specified, the pod will be dispatched by default scheduler. | `list(any)` | `[]` | no |
-| <a name="input_allowed_aws_accounts"></a> [allowed\_aws\_accounts](#input\_allowed\_aws\_accounts) | AWS accounts allowed to pull from the created ECR | `list(string)` | `[]` | no |
 | <a name="input_annotations"></a> [annotations](#input\_annotations) | Map of annotations to add to the Deployment. | `map(string)` | `{}` | no |
 | <a name="input_args"></a> [args](#input\_args) | Arguments to the entrypoint. | `list(string)` | `[]` | no |
 | <a name="input_command"></a> [command](#input\_command) | Entrypoint list of the image. | `list(string)` | `[]` | no |
+| <a name="input_ecr_allowed_aws_accounts"></a> [ecr\_allowed\_aws\_accounts](#input\_ecr\_allowed\_aws\_accounts) | AWS accounts allowed to pull from the created ECR | `list(string)` | `[]` | no |
 | <a name="input_ecr_create"></a> [ecr\_create](#input\_ecr\_create) | Controls if ECR repo should be created. | `bool` | `true` | no |
 | <a name="input_ecr_encryption_type"></a> [ecr\_encryption\_type](#input\_ecr\_encryption\_type) | The encryption type for the repository. Must be one of: `KMS` or `AES256`. | `string` | `"KMS"` | no |
 | <a name="input_ecr_lifecycle_policy"></a> [ecr\_lifecycle\_policy](#input\_ecr\_lifecycle\_policy) | Sets the lifecycle policy of the ECR. If set `ecr_number_of_images_to_keep` won't work. | `string` | `""` | no |
