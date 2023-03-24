@@ -92,7 +92,7 @@ data "aws_iam_policy_document" "main" {
   count = var.ecr_create ? 1 : 0
 
   dynamic "statement" {
-    for_each = var.allowed_aws_accounts
+    for_each = var.ecr_allowed_aws_accounts
     content {
       sid    = "Pull only for ${statement.value}"
       effect = "Allow"
@@ -111,7 +111,7 @@ data "aws_iam_policy_document" "main" {
   }
 }
 resource "aws_ecr_repository_policy" "main" {
-  count = var.ecr_create ? (length(var.allowed_aws_accounts) > 0 ? 1 : 0) : 0
+  count = var.ecr_create ? (length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0) : 0
 
   repository = aws_ecr_repository.main[0].name
   policy     = data.aws_iam_policy_document.main[0].json
