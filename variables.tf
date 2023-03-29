@@ -151,8 +151,8 @@ variable "strategy_type" {
 }
 
 variable "strategy_rolling_update" {
-  type = map(any)
-  default = {}
+  type = list(any)
+  default = []
   description = "Rolling update config params. Present only if type = RollingUpdate."
 }
 
