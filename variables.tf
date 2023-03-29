@@ -150,6 +150,12 @@ variable "strategy_type" {
   description = "Type of deployment. Can be 'Recreate' or 'RollingUpdate'. Default is RollingUpdate."
 }
 
+variable "strategy_rolling_update" {
+  type = map(any)
+  default = {}
+  description = "Rolling update config params. Present only if type = RollingUpdate."
+}
+
 variable "svc_annotations" {
   type        = map(any)
   default     = {}
