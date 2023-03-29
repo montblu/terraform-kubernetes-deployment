@@ -136,9 +136,10 @@ resource "kubernetes_deployment" "main" {
 
       dynamic "rolling_update" {
         for_each = var.strategy_type == "RollingUpdate" ? var.strategy_rolling_update : []
-
-        max_surge       = lookup(rolling_update.value, "max_surge", "")
-        max_unavailable = lookup(rolling_update.value, "max_unavailable", "")
+        content {
+          max_surge       = lookup(rolling_update.value, "max_surge", "")
+          max_unavailable = lookup(rolling_update.value, "max_unavailable", "")
+        }
       }
     }
 
