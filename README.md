@@ -61,6 +61,8 @@ No modules.
 | <a name="input_replicas"></a> [replicas](#input\_replicas) | The number of desired replicas. | `number` | `1` | no |
 | <a name="input_resource_limits"></a> [resource\_limits](#input\_resource\_limits) | Describes the maximum amount of compute resources allowed. | `map(string)` | `{}` | no |
 | <a name="input_resource_requests"></a> [resource\_requests](#input\_resource\_requests) | Describes the minimum amount of compute resources required. | `map(string)` | `{}` | no |
+| <a name="input_strategy_rolling_update"></a> [strategy\_rolling\_update](#input\_strategy\_rolling\_update) | Rolling update config params. Present only if type = RollingUpdate. | `list(any)` | `[]` | no |
+| <a name="input_strategy_type"></a> [strategy\_type](#input\_strategy\_type) | Type of deployment. Can be 'Recreate' or 'RollingUpdate'. Default is RollingUpdate. | `string` | `"RollingUpdate"` | no |
 | <a name="input_svc_annotations"></a> [svc\_annotations](#input\_svc\_annotations) | Map of annotations to add to the Service. | `map(any)` | `{}` | no |
 | <a name="input_svc_create"></a> [svc\_create](#input\_svc\_create) | Controls if a service should be created for the deployment. | `bool` | `true` | no |
 | <a name="input_svc_labels"></a> [svc\_labels](#input\_svc\_labels) | Map of string keys and values that can be used to organize and categorize (scope and select) the service. | `map(any)` | `{}` | no |

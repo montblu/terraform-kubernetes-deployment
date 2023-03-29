@@ -144,6 +144,18 @@ variable "resource_requests" {
   description = "Describes the minimum amount of compute resources required."
 }
 
+variable "strategy_type" {
+  type        = string
+  default     = "RollingUpdate"
+  description = "Type of deployment. Can be 'Recreate' or 'RollingUpdate'. Default is RollingUpdate."
+}
+
+variable "strategy_rolling_update" {
+  type = list(any)
+  default = []
+  description = "Rolling update config params. Present only if type = RollingUpdate."
+}
+
 variable "svc_annotations" {
   type        = map(any)
   default     = {}
