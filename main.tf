@@ -131,6 +131,9 @@ resource "kubernetes_deployment" "main" {
 
   spec {
     replicas = var.replicas
+    strategy {
+      type = var.strategy_type
+    }
 
     selector {
       match_labels = local.labels
