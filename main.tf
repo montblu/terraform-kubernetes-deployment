@@ -133,6 +133,13 @@ resource "kubernetes_deployment" "main" {
     replicas = var.replicas
     strategy {
       type = var.strategy_type
+
+      dynamic "rolling_update" {
+        for_each = var.strategy_type == "RollingUpdate" ? strategy_rolling_update : []
+
+        max_surge       = lookup(rolling_update.value, "max_surge", "")
+        max_unavailable = lookup(rolling_update.value, "max_unavailable", "")
+      }
     }
 
     selector {
