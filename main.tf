@@ -1,7 +1,7 @@
 locals {
   resource_name = "${var.name_prefix}-${var.name}"
 
-resource "aws_ecr_lifecycle_policy" "ramp_ecr_lifecycle_policy" {
+module "ramp_ecr_lifecycle_policy" {
   #repository = local.resource_name
   #repository = 
   policy     = <<EOF
