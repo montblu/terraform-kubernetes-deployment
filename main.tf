@@ -1,7 +1,7 @@
 locals {
   resource_name = "${var.name_prefix}-${var.name}"
 
-  ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ? aws_ecr_lifecycle_policy.ramp_ecr_lifecycle_policy : var.ecr_lifecycle_policy
+  ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ? aws_ecr_lifecycle_policy.ramp_ecr_lifecycle_policy.policy : var.ecr_lifecycle_policy
 
   annotations = var.annotations
   default_labels = {
