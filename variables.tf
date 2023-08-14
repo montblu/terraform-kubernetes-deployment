@@ -56,12 +56,23 @@ variable "ecr_scan_on_push" {
   description = "Controls if ECR should scan images after pushed."
 }
 
-variable "ecr_number_of_images_to_keep" {
+variable "ecr_number_of_images_to_keep_on_main" {
   type        = number
   default     = 30
   description = "Controls how many images should be kept in the ECR repo."
 }
 
+variable "ecr_number_of_images_to_keep_on_branches" {
+  type        = number
+  default     = 10
+  description = "Controls how many images should be kept on branches in the ECR repo."
+}
+
+variable "ecr_number_of_images_to_keep_untagged" {
+  type        = number
+  default     = 7
+  description = "Controls how many images should be kept untagged"
+}
 variable "init_container" {
   type        = list(any)
   default     = []

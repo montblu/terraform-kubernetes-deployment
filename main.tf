@@ -1,16 +1,45 @@
 locals {
   resource_name = "${var.name_prefix}-${var.name}"
 
-  default_ecr_lifecycle_policy = <<EOF
+resource "aws_ecr_lifecycle_policy" "ramp__ecr_lifecycle_policy" {
+  #repository = local.resource_name
+  #repository = 
+  policy     = <<EOF
 {
     "rules": [
         {
             "rulePriority": 1,
-            "description": "Keep last ${var.ecr_number_of_images_to_keep} images",
+            "description": "Keep untagged images for ${var.ecr_number_of_images_to_keep_untagged} days",
+            "selection": {
+                "tagStatus": "untagged",
+                "countType": "sinceImagePushed",
+                "countUnit": "days",
+                "countNumber": ${var.ecr_number_of_images_to_keep_untagged}
+            },
+            "action": {
+                "type": "expire"
+            }
+        },
+        {
+            "rulePriority": 2,
+            "description": "Keep last ${var.ecr_number_of_images_to_keep_on_main} images (Main)",
+            "selection": {
+                "tagStatus": "tagged",
+                "tagPrefixList": ["main"],
+                "countType": "imageCountMoreThan",
+                "countNumber": ${var.ecr_number_of_images_to_keep_on_main}
+            },
+            "action": {
+                "type": "expire"
+            }
+        },
+        {
+            "rulePriority": 3,
+            "description": "Keep last ${var.ecr_number_of_images_to_keep_on_branches} images (All except Main)",
             "selection": {
                 "tagStatus": "any",
                 "countType": "imageCountMoreThan",
-                "countNumber": ${var.ecr_number_of_images_to_keep}
+                "countNumber": ${var.ecr_number_of_images_to_keep_on_branches}
             },
             "action": {
                 "type": "expire"
@@ -19,8 +48,10 @@ locals {
     ]
 }
 EOF
+}
 
-  ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ? local.default_ecr_lifecycle_policy : var.ecr_lifecycle_policy
+  #ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ? local.default_ecr_lifecycle_policy : var.ecr_lifecycle_policy
+  ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ?  local.ramp__ecr_lifecycle_policy : var.ecr_lifecycle_policy
 
   annotations = var.annotations
   default_labels = {
