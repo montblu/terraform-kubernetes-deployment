@@ -1,9 +1,44 @@
 locals {
   resource_name = "${var.name_prefix}-${var.name}"
 
-module "ramp_ecr_lifecycle_policy" {
-  #repository = local.resource_name
-  #repository = 
+  ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ? aws_ecr_lifecycle_policy.ramp_ecr_lifecycle_policy : var.ecr_lifecycle_policy
+
+  annotations = var.annotations
+  default_labels = {
+    app = local.resource_name
+  }
+
+  labels = merge(local.default_labels, var.labels)
+
+  image = var.image == "" ? (var.ecr_create ? aws_ecr_repository.main[0].repository_url : "dummy") : var.image
+
+  svc_labels = merge(local.default_labels, var.svc_labels)
+
+  container = {
+    args              = var.args
+    command           = var.command
+    env               = var.env
+    env_from          = var.env_from
+    name              = local.resource_name
+    image             = local.image
+    image_pull_policy = var.image_pull_policy
+    liveness_probe    = var.liveness_probe
+    readiness_probe   = var.readiness_probe
+    volume_mount      = var.volume_mount
+    working_dir       = var.working_dir
+    resources = [
+      {
+        limits   = var.resource_limits
+        requests = var.resource_requests
+      }
+    ]
+  }
+
+  containers = concat([local.container], var.additional_containers)
+}
+
+resource "aws_ecr_lifecycle_policy" "ramp_ecr_lifecycle_policy" {
+  repository = aws_ecr_repository.main[0].name
   policy     = <<EOF
 {
     "rules": [
@@ -49,44 +84,6 @@ module "ramp_ecr_lifecycle_policy" {
 }
 EOF
 }
-
-  #ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ? local.default_ecr_lifecycle_policy : var.ecr_lifecycle_policy
-  ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ?  local.ramp__ecr_lifecycle_policy : var.ecr_lifecycle_policy
-
-  annotations = var.annotations
-  default_labels = {
-    app = local.resource_name
-  }
-
-  labels = merge(local.default_labels, var.labels)
-
-  image = var.image == "" ? (var.ecr_create ? aws_ecr_repository.main[0].repository_url : "dummy") : var.image
-
-  svc_labels = merge(local.default_labels, var.svc_labels)
-
-  container = {
-    args              = var.args
-    command           = var.command
-    env               = var.env
-    env_from          = var.env_from
-    name              = local.resource_name
-    image             = local.image
-    image_pull_policy = var.image_pull_policy
-    liveness_probe    = var.liveness_probe
-    readiness_probe   = var.readiness_probe
-    volume_mount      = var.volume_mount
-    working_dir       = var.working_dir
-    resources = [
-      {
-        limits   = var.resource_limits
-        requests = var.resource_requests
-      }
-    ]
-  }
-
-  containers = concat([local.container], var.additional_containers)
-}
-
 
 ################################################################################
 # ECR Repository
