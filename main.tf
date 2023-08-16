@@ -1,7 +1,7 @@
 locals {
   resource_name = "${var.name_prefix}-${var.name}"
 
-  ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ? aws_ecr_lifecycle_policy.ramp_ecr_lifecycle_policy.policy : var.ecr_lifecycle_policy
+  ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ? aws_ecr_lifecycle_policy.ecr_lifecycle_policy.policy : var.ecr_lifecycle_policy
 
   annotations = var.annotations
   default_labels = {
@@ -37,19 +37,19 @@ locals {
   containers = concat([local.container], var.additional_containers)
 }
 
-resource "aws_ecr_lifecycle_policy" "ramp_ecr_lifecycle_policy" {
+resource "aws_ecr_lifecycle_policy" "ecr_lifecycle_policy" {
   repository = aws_ecr_repository.main[0].name
   policy     = <<EOF
 {
     "rules": [
         {
             "rulePriority": 1,
-            "description": "Keep untagged images for ${var.ecr_number_of_images_to_keep_untagged} days",
+            "description": "Keep untagged images for ${var.ecr_number_of_images_untagged} days",
             "selection": {
                 "tagStatus": "untagged",
                 "countType": "sinceImagePushed",
                 "countUnit": "days",
-                "countNumber": ${var.ecr_number_of_images_to_keep_untagged}
+                "countNumber": ${var.ecr_number_of_images_untagged}
             },
             "action": {
                 "type": "expire"
@@ -57,12 +57,12 @@ resource "aws_ecr_lifecycle_policy" "ramp_ecr_lifecycle_policy" {
         },
         {
             "rulePriority": 2,
-            "description": "Keep last ${var.ecr_number_of_images_to_keep_on_main} images (Main)",
+            "description": "Keep last ${var.ecr_number_of_images_from_main} images (Main)",
             "selection": {
                 "tagStatus": "tagged",
                 "tagPrefixList": ["main"],
                 "countType": "imageCountMoreThan",
-                "countNumber": ${var.ecr_number_of_images_to_keep_on_main}
+                "countNumber": ${var.ecr_number_of_images_from_main}
             },
             "action": {
                 "type": "expire"
@@ -70,11 +70,11 @@ resource "aws_ecr_lifecycle_policy" "ramp_ecr_lifecycle_policy" {
         },
         {
             "rulePriority": 3,
-            "description": "Keep last ${var.ecr_number_of_images_to_keep_on_branches} images (All except Main)",
+            "description": "Keep last ${var.ecr_number_of_images_from_branches} images (All except Main)",
             "selection": {
                 "tagStatus": "any",
                 "countType": "imageCountMoreThan",
-                "countNumber": ${var.ecr_number_of_images_to_keep_on_branches}
+                "countNumber": ${var.ecr_number_of_images_from_branches}
             },
             "action": {
                 "type": "expire"
