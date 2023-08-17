@@ -6,11 +6,37 @@ locals {
     "rules": [
         {
             "rulePriority": 1,
-            "description": "Keep last ${var.ecr_number_of_images_to_keep} images",
+            "description": "Keep untagged images for 1 week",
+            "selection": {
+                "tagStatus": "untagged",
+                "countType": "sinceImagePushed",
+                "countUnit": "days",
+                "countNumber": 7
+            },
+            "action": {
+                "type": "expire"
+            }
+        },
+        {
+            "rulePriority": 2,
+            "description": "Keep last 30 images (Main)",
+            "selection": {
+                "tagStatus": "tagged",
+                "tagPrefixList": ["main"],
+                "countType": "imageCountMoreThan",
+                "countNumber": 30
+            },
+            "action": {
+                "type": "expire"
+            }
+        },
+        {
+            "rulePriority": 3,
+            "description": "Keep last 10 images (All except Main)",
             "selection": {
                 "tagStatus": "any",
                 "countType": "imageCountMoreThan",
-                "countNumber": ${var.ecr_number_of_images_to_keep}
+                "countNumber": 10
             },
             "action": {
                 "type": "expire"
