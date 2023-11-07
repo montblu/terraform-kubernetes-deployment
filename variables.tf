@@ -85,10 +85,10 @@ variable "env_from" {
   description = "List of sources to populate environment variables in the container."
 }
 
-variable "image" {
+variable "image_repository" {
   type        = string
   default     = ""
-  description = "Docker image name."
+  description = "Repository of the image used. If not specified it will use ECR if is enabled, otherwise will use a 'dummy' placeholder"
 }
 
 variable "image_pull_policy" {
@@ -145,8 +145,8 @@ variable "strategy_type" {
 }
 
 variable "strategy_rolling_update" {
-  type = list(any)
-  default = []
+  type        = list(any)
+  default     = []
   description = "Rolling update config params. Present only if type = RollingUpdate."
 }
 
