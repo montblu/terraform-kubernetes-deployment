@@ -1,5 +1,6 @@
 locals {
-  resource_name = "${var.name_prefix}-${var.name}"
+  resource_name    = "${var.name_prefix}-${var.name}"
+  image_repository = var.image_repository == "" ? (var.ecr_create ? aws_ecr_repository.main.repository_url : "dummy") : var.image_repository
 
   default_ecr_lifecycle_policy = <<EOF
 {
@@ -65,7 +66,7 @@ EOF
     env               = var.env
     env_from          = var.env_from
     name              = local.resource_name
-    image             = local.image
+    image             = "local.image"
     image_pull_policy = var.image_pull_policy
     liveness_probe    = var.liveness_probe
     readiness_probe   = var.readiness_probe
