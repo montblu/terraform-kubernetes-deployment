@@ -45,12 +45,12 @@ No modules.
 | <a name="input_ecr_create"></a> [ecr\_create](#input\_ecr\_create) | Controls if ECR repo should be created. | `bool` | `true` | no |
 | <a name="input_ecr_encryption_type"></a> [ecr\_encryption\_type](#input\_ecr\_encryption\_type) | The encryption type for the repository. Must be one of: `KMS` or `AES256`. | `string` | `"KMS"` | no |
 | <a name="input_ecr_lifecycle_policy"></a> [ecr\_lifecycle\_policy](#input\_ecr\_lifecycle\_policy) | Sets the lifecycle policy of the ECR. If set `ecr_number_of_images_to_keep` won't work. | `string` | `""` | no |
-| <a name="input_ecr_number_of_images_to_keep"></a> [ecr\_number\_of\_images\_to\_keep](#input\_ecr\_number\_of\_images\_to\_keep) | Controls how many images should be kept in the ECR repo. | `number` | `30` | no |
 | <a name="input_ecr_scan_on_push"></a> [ecr\_scan\_on\_push](#input\_ecr\_scan\_on\_push) | Controls if ECR should scan images after pushed. | `bool` | `true` | no |
 | <a name="input_env"></a> [env](#input\_env) | Block of string name and value pairs to set in the container's environment. | `list(any)` | `[]` | no |
 | <a name="input_env_from"></a> [env\_from](#input\_env\_from) | List of sources to populate environment variables in the container. | `any` | `[]` | no |
-| <a name="input_image"></a> [image](#input\_image) | Docker image name. | `string` | `""` | no |
 | <a name="input_image_pull_policy"></a> [image\_pull\_policy](#input\_image\_pull\_policy) | Image pull policy. One of Always, Never, IfNotPresent. | `string` | `"IfNotPresent"` | no |
+| <a name="input_image_repository"></a> [image\_repository](#input\_image\_repository) | Repository of the image used. If not specified it will use ECR if is enabled, otherwise will use a 'dummy' placeholder | `string` | `""` | no |
+| <a name="input_image_tag"></a> [image\_tag](#input\_image\_tag) | Tag of the image used. If not specified will use empty tag. | `string` | `""` | no |
 | <a name="input_init_container"></a> [init\_container](#input\_init\_container) | List of init containers belonging to the pod. Init containers always run to completion and each must complete successfully before the next is started. | `list(any)` | `[]` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of string keys and values that can be used to organize and categorize (scope and select) the deployment. | `map(any)` | `{}` | no |
 | <a name="input_liveness_probe"></a> [liveness\_probe](#input\_liveness\_probe) | Periodic probe of container liveness. Container will be restarted if the probe fails. | `list(any)` | `[]` | no |
