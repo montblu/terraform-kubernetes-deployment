@@ -88,7 +88,7 @@ variable "env_from" {
 variable "image_repository" {
   type        = string
   default     = ""
-  description = "Repository of the image used. If not specified it will use ECR if is enabled, otherwise will use a 'dummy' placeholder"
+  description = "The repository where the image is pulled from. If unspecified and var.ecr_create is true, it will use the created ECR repository url. Howevever, if unspecified and var.ecr_create is false, it will use 'dummy' as placeholder - may be used when the image is set by some external process to this module."
 }
 
 variable "image_tag" {
