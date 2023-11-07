@@ -91,6 +91,12 @@ variable "image_repository" {
   description = "Repository of the image used. If not specified it will use ECR if is enabled, otherwise will use a 'dummy' placeholder"
 }
 
+variable "image_tag" {
+  type        = string
+  default     = ""
+  description = "Tag of the image used. If not specified will use empty tag."
+}
+
 variable "image_pull_policy" {
   type        = string
   default     = "IfNotPresent"
