@@ -49,7 +49,7 @@ No modules.
 | <a name="input_env"></a> [env](#input\_env) | Block of string name and value pairs to set in the container's environment. | `list(any)` | `[]` | no |
 | <a name="input_env_from"></a> [env\_from](#input\_env\_from) | List of sources to populate environment variables in the container. | `any` | `[]` | no |
 | <a name="input_image_pull_policy"></a> [image\_pull\_policy](#input\_image\_pull\_policy) | Image pull policy. One of Always, Never, IfNotPresent. | `string` | `"IfNotPresent"` | no |
-| <a name="input_image_repository"></a> [image\_repository](#input\_image\_repository) | Repository of the image used. If not specified it will use ECR if is enabled, otherwise will use a 'dummy' placeholder | `string` | `""` | no |
+| <a name="input_image_repository"></a> [image\_repository](#input\_image\_repository) | The repository where the image is pulled from. If unspecified and var.ecr\_create is true, it will use the created ECR repository url. Howevever, if unspecified and var.ecr\_create is false, it will use 'dummy' as placeholder - may be used when the image is set by some external process to this module. | `string` | `""` | no |
 | <a name="input_image_tag"></a> [image\_tag](#input\_image\_tag) | Tag of the image used. If not specified will use empty tag. | `string` | `""` | no |
 | <a name="input_init_container"></a> [init\_container](#input\_init\_container) | List of init containers belonging to the pod. Init containers always run to completion and each must complete successfully before the next is started. | `list(any)` | `[]` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of string keys and values that can be used to organize and categorize (scope and select) the deployment. | `map(any)` | `{}` | no |
