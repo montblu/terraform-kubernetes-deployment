@@ -85,10 +85,16 @@ variable "env_from" {
   description = "List of sources to populate environment variables in the container."
 }
 
-variable "image" {
+variable "image_repository" {
   type        = string
   default     = ""
-  description = "Docker image name."
+  description = "The repository where the image is pulled from. If unspecified and var.ecr_create is true, it will use the created ECR repository url. Howevever, if unspecified and var.ecr_create is false, it will use 'dummy' as placeholder - may be used when the image is set by some external process to this module."
+}
+
+variable "image_tag" {
+  type        = string
+  default     = ""
+  description = "Tag of the image used. If not specified will use empty tag."
 }
 
 variable "image_pull_policy" {
@@ -145,8 +151,8 @@ variable "strategy_type" {
 }
 
 variable "strategy_rolling_update" {
-  type = list(any)
-  default = []
+  type        = list(any)
+  default     = []
   description = "Rolling update config params. Present only if type = RollingUpdate."
 }
 
