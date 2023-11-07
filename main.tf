@@ -56,7 +56,8 @@ EOF
 
   labels = merge(local.default_labels, var.labels)
 
-  image = var.image == "" ? (var.ecr_create ? aws_ecr_repository.main[0].repository_url : "dummy") : var.image
+  image_repository = var.image_repository == "" ? (var.ecr_create ? aws_ecr_repository.main.repository_url : "dummy") : var.image_repository
+  image            = var.image_tag == "" ? local.image_repository : "${local.image_repository}:${var.image_tag}"
 
   svc_labels = merge(local.default_labels, var.svc_labels)
 
