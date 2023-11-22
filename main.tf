@@ -399,9 +399,9 @@ resource "kubernetes_deployment" "main" {
                 }
               }
             }
-            name              = lookup(init_container.value, "name", [])
-            image             = lookup(init_container.value, "image", [])
-            image_pull_policy = lookup(init_container.value, "image_pull_policy", [])
+            name              = lookup(init_container.value, "name", null)
+            image             = lookup(init_container.value, "image", null)
+            image_pull_policy = lookup(init_container.value, "image_pull_policy", null)
             dynamic "liveness_probe" {
               for_each = lookup(init_container.value, "liveness_probe", [])
               content {
@@ -451,7 +451,7 @@ resource "kubernetes_deployment" "main" {
               }
             }
 
-            working_dir = lookup(init_container.value, "working_dir", [])
+            working_dir = lookup(init_container.value, "working_dir", null)
 
             dynamic "resources" {
               for_each = lookup(init_container.value, "resources", [])
