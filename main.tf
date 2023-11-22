@@ -399,7 +399,7 @@ resource "kubernetes_deployment" "main" {
                 }
               }
             }
-            name              = lookup(init_container.value, "name", null)
+            name              = "${var.name_prefix}-${lookup(init_container.value, "name", null)}"
             image             = lookup(init_container.value, "image", null)
             image_pull_policy = lookup(init_container.value, "image_pull_policy", null)
             dynamic "liveness_probe" {
@@ -530,7 +530,7 @@ resource "kubernetes_deployment" "main" {
                 }
               }
             }
-            name              = lookup(container.value, "name", null)
+            name              = "${var.name_prefix}-${lookup(container.value, "name", null)}"
             image             = lookup(container.value, "image", null)
             image_pull_policy = lookup(container.value, "image_pull_policy", null)
             dynamic "liveness_probe" {
