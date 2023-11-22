@@ -398,7 +398,7 @@ resource "kubernetes_deployment" "main" {
                 }
               }
             }
-            name              = "${var.name_prefix}-${lookup(init_container.value, "name", null)}"
+            name              = lookup(init_container.value, "name", null) == null ? "${local.resource_name}-init" : "${local.resource_name}-init-${lookup(init_container.value, "name")}"
             image             = lookup(init_container.value, "image", local.image)
             image_pull_policy = lookup(init_container.value, "image_pull_policy", null)
             dynamic "liveness_probe" {
