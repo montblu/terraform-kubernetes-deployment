@@ -65,7 +65,6 @@ EOF
     command           = var.command
     env               = var.env
     env_from          = var.env_from
-    name              = var.name
     image_pull_policy = var.image_pull_policy
     liveness_probe    = var.liveness_probe
     readiness_probe   = var.readiness_probe
@@ -398,7 +397,7 @@ resource "kubernetes_deployment" "main" {
                 }
               }
             }
-            name              = "${var.name_prefix}-${lookup(init_container.value, "name", null)}"
+            name              = lookup(init_container.value, "name", null) == null ? "${local.resource_name}-init" : "${local.resource_name}-init-${lookup(init_container.value, "name")}"
             image             = lookup(init_container.value, "image", local.image)
             image_pull_policy = lookup(init_container.value, "image_pull_policy", null)
             dynamic "liveness_probe" {
@@ -529,7 +528,7 @@ resource "kubernetes_deployment" "main" {
                 }
               }
             }
-            name              = "${var.name_prefix}-${lookup(container.value, "name", null)}"
+            name              = lookup(container.value, "name", null) == null ? local.resource_name : "${local.resource_name}-${lookup(container.value, "name")}"
             image             = lookup(container.value, "image", local.image)
             image_pull_policy = lookup(container.value, "image_pull_policy", null)
             dynamic "liveness_probe" {
