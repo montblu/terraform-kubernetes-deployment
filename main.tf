@@ -65,7 +65,7 @@ EOF
     command           = var.command
     env               = var.env
     env_from          = var.env_from
-    name              = local.resource_name
+    name              = var.name
     image             = local.image
     image_pull_policy = var.image_pull_policy
     liveness_probe    = var.liveness_probe
