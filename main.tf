@@ -258,7 +258,7 @@ resource "kubernetes_deployment" "main" {
           for_each = var.deployment.init_container
           content {
             name              = "${local.resource_name}-init"
-            image             = container.value.image_repository != "" ? "${init_container.value.image_repository}:${init_container.value.image}" : "${local.general_image_repository}:${init_container.value.image}"
+            image             = init_container.value.image_repository != "" ? "${init_container.value.image_repository}:${init_container.value.image}" : "${local.general_image_repository}:${init_container.value.image}"
             image_pull_policy = init_container.value.image_pull_policy
             args              = init_container.value.args
             command           = init_container.value.command
