@@ -1,120 +1,45 @@
 locals {
-  resource_name = "${var.name_prefix}-${var.name}"
+  resource_name = "${var.deployment.prefix}-${var.deployment.name}"
 
-  default_ecr_lifecycle_policy = <<EOF
-{
-    "rules": [
-        {
-            "rulePriority": 1,
-            "description": "Keep untagged images for 1 week",
-            "selection": {
-                "tagStatus": "untagged",
-                "countType": "sinceImagePushed",
-                "countUnit": "days",
-                "countNumber": 7
-            },
-            "action": {
-                "type": "expire"
-            }
-        },
-        {
-            "rulePriority": 2,
-            "description": "Keep last 30 images (Main)",
-            "selection": {
-                "tagStatus": "tagged",
-                "tagPrefixList": ["main"],
-                "countType": "imageCountMoreThan",
-                "countNumber": 30
-            },
-            "action": {
-                "type": "expire"
-            }
-        },
-        {
-            "rulePriority": 3,
-            "description": "Keep last 10 images (All except Main)",
-            "selection": {
-                "tagStatus": "any",
-                "countType": "imageCountMoreThan",
-                "countNumber": 10
-            },
-            "action": {
-                "type": "expire"
-            }
-        }
-    ]
-}
-EOF
-
-  ecr_lifecycle_policy = var.ecr_lifecycle_policy == "" ? local.default_ecr_lifecycle_policy : var.ecr_lifecycle_policy
-
-  annotations = var.annotations
-  default_labels = {
+  base_labels = {
     app = local.resource_name
   }
 
-  labels = merge(local.default_labels, var.labels)
+  labels = merge(local.base_labels, var.deployment.labels)
 
-  image_repository = var.image_repository == "" ? (var.ecr_create ? aws_ecr_repository.main[0].repository_url : "dummy") : var.image_repository
-  image            = var.image_tag == "" ? local.image_repository : "${local.image_repository}:${var.image_tag}"
+  general_image_repository = var.deployment.create_ecr ? aws_ecr_repository.main[0].repository_url : (var.image_repository != "" ? var.image_repository : "")
 
-  svc_labels = merge(local.default_labels, var.svc_labels)
-
-  container = {
-    args              = var.args
-    command           = var.command
-    env               = var.env
-    env_from          = var.env_from
-    image_pull_policy = var.image_pull_policy
-    liveness_probe    = var.liveness_probe
-    readiness_probe   = var.readiness_probe
-    volume_mount      = var.volume_mount
-    working_dir       = var.working_dir
-    resources = [
-      {
-        limits   = var.resource_limits
-        requests = var.resource_requests
-      }
-    ]
-  }
-
-  containers = concat([local.container], var.additional_containers)
+  svc_labels = merge(local.base_labels, var.deployment.svc_labels)
 }
-
 
 ################################################################################
 # ECR Repository
 ################################################################################
 resource "aws_ecr_repository" "main" {
-  count = var.ecr_create ? 1 : 0
+  count = var.deployment.create_ecr ? 1 : 0
 
   name = local.resource_name
 
   image_scanning_configuration {
-    scan_on_push = var.ecr_scan_on_push
+    scan_on_push = var.deployment.ecr_scan_on_push
   }
 
   encryption_configuration {
-    encryption_type = var.ecr_encryption_type
+    encryption_type = var.deployment.ecr_encryption_type
   }
 
-  tags = var.tags
 }
 
 resource "aws_ecr_lifecycle_policy" "main" {
-  count = var.ecr_create ? 1 : 0
+  count = var.deployment.create_ecr ? 1 : 0
 
   repository = aws_ecr_repository.main[0].name
-  policy     = local.ecr_lifecycle_policy
-
-  depends_on = [
-    aws_ecr_repository.main
-  ]
+  policy     = var.ecr_lifecycle_policy
 }
 
 # allow pull from all other accounts
 data "aws_iam_policy_document" "main" {
-  count = var.ecr_create ? (length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0) : 0
+  count = var.deployment.create_ecr && length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0
 
   dynamic "statement" {
     for_each = var.ecr_allowed_aws_accounts
@@ -135,8 +60,9 @@ data "aws_iam_policy_document" "main" {
     }
   }
 }
+
 resource "aws_ecr_repository_policy" "main" {
-  count = var.ecr_create ? (length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0) : 0
+  count = var.deployment.create_ecr && length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0
 
   repository = aws_ecr_repository.main[0].name
   policy     = data.aws_iam_policy_document.main[0].json
@@ -148,14 +74,14 @@ resource "aws_ecr_repository_policy" "main" {
 resource "kubernetes_deployment" "main" {
   metadata {
     name      = local.resource_name
-    namespace = var.namespace
+    namespace = var.deployment.namespace
 
-    annotations = local.annotations
+    annotations = var.deployment.annotations
     labels      = local.labels
   }
 
   spec {
-    replicas = var.replicas
+    replicas = var.deployment.replicas
     strategy {
       type = var.strategy_type
 
@@ -176,27 +102,25 @@ resource "kubernetes_deployment" "main" {
       metadata {
         labels = local.labels
       }
-
       spec {
-
         dynamic "affinity" {
-          for_each = var.affinity
+          for_each = var.deployment.affinity
           content {
             dynamic "node_affinity" {
-              for_each = lookup(affinity.value, "node_affinity", [])
+              for_each = can(affinity.value["node_affinity"]) ? affinity.value["node_affinity"] : []
               content {
                 dynamic "required_during_scheduling_ignored_during_execution" {
-                  for_each = lookup(node_affinity.value, "required_during_scheduling_ignored_during_execution", [])
+                  for_each = can(node_affinity.value["required_during_scheduling_ignored_during_execution"]) ? node_affinity.value["required_during_scheduling_ignored_during_execution"] : []
                   content {
                     dynamic "node_selector_term" {
-                      for_each = lookup(required_during_scheduling_ignored_during_execution.value, "node_selector_term", [])
+                      for_each = can(required_during_scheduling_ignored_during_execution.value["node_selector_term"]) ? required_during_scheduling_ignored_during_execution.value["node_selector_term"] : []
                       content {
                         dynamic "match_expressions" {
-                          for_each = lookup(node_selector_term.value, "match_expressions", [])
+                          for_each = can(node_selector_term.value["match_expressions"]) ? node_selector_term.value["match_expressions"] : []
                           content {
-                            key      = lookup(match_expressions.value, "key", null)
-                            operator = lookup(match_expressions.value, "operator", null)
-                            values   = lookup(match_expressions.value, "values", null)
+                            key      = can(match_expressions.value["key"]) ? match_expressions.value["key"] : null
+                            operator = can(match_expressions.value["operator"]) ? match_expressions.value["operator"] : null
+                            values   = can(match_expressions.value["values"]) ? match_expressions.value["values"] : null
                           }
                         }
                       }
@@ -204,173 +128,178 @@ resource "kubernetes_deployment" "main" {
                   }
                 }
                 dynamic "preferred_during_scheduling_ignored_during_execution" {
-                  for_each = lookup(node_affinity.value, "preferred_during_scheduling_ignored_during_execution", [])
+                  for_each = can(node_affinity.value["preferred_during_scheduling_ignored_during_execution"]) ? node_affinity.value["preferred_during_scheduling_ignored_during_execution"] : []
                   content {
                     dynamic "preference" {
-                      for_each = lookup(preferred_during_scheduling_ignored_during_execution.value, "preference", [])
+                      for_each = can(preferred_during_scheduling_ignored_during_execution.value["preference"]) ? preferred_during_scheduling_ignored_during_execution.value["preference"] : []
                       content {
                         dynamic "match_expressions" {
-                          for_each = lookup(preference.value, "match_expressions", [])
+                          for_each = can(preference.value["match_expressions"]) ? preference.value["match_expressions"] : []
                           content {
-                            key      = lookup(match_expressions.value, "key", null)
-                            operator = lookup(match_expressions.value, "operator", null)
-                            values   = lookup(match_expressions.value, "values", null)
+                            key      = can(match_expressions.value["key"]) ? match_expressions.value["key"] : null
+                            operator = can(match_expressions.value["operator"]) ? match_expressions.value["operator"] : null
+                            values   = can(match_expressions.value["values"]) ? match_expressions.value["values"] : null
                           }
                         }
                       }
                     }
 
-                    weight = lookup(preferred_during_scheduling_ignored_during_execution.value, "weight", null)
+                    weight = can(preferred_during_scheduling_ignored_during_execution.value["weight"]) ? preferred_during_scheduling_ignored_during_execution.value["weight"] : null
                   }
                 }
               }
             }
             dynamic "pod_affinity" {
-              for_each = lookup(affinity.value, "pod_affinity", [])
+              for_each = can(affinity.value["pod_affinity"]) ? affinity.value["pod_affinity"] : []
               content {
                 dynamic "required_during_scheduling_ignored_during_execution" {
-                  for_each = lookup(pod_affinity.value, "required_during_scheduling_ignored_during_execution", [])
+                  for_each = can(pod_affinity.value["required_during_scheduling_ignored_during_execution"]) ? pod_affinity.value["required_during_scheduling_ignored_during_execution"] : []
                   content {
                     dynamic "label_selector" {
-                      for_each = lookup(required_during_scheduling_ignored_during_execution.value, "label_selector", [])
+                      for_each = can(required_during_scheduling_ignored_during_execution.value["label_selector"]) ? required_during_scheduling_ignored_during_execution.value["label_selector"] : []
                       content {
                         dynamic "match_expressions" {
-                          for_each = lookup(label_selector.value, "match_expressions", [])
+                          for_each = can(label_selector.value["match_expressions"]) ? label_selector.value["match_expressions"] : []
                           content {
-                            key      = lookup(match_expressions.value, "key", null)
-                            operator = lookup(match_expressions.value, "operator", null)
-                            values   = lookup(match_expressions.value, "values", null)
+                            key      = can(match_expressions.value["key"]) ? match_expressions.value["key"] : null
+                            operator = can(match_expressions.value["operator"]) ? match_expressions.value["operator"] : null
+                            values   = can(match_expressions.value["values"]) ? match_expressions.value["values"] : null
                           }
                         }
                       }
                     }
-                    namespaces   = lookup(required_during_scheduling_ignored_during_execution.value, "namespaces", null)
-                    topology_key = lookup(required_during_scheduling_ignored_during_execution.value, "topology_key", null)
+                    namespaces   = can(required_during_scheduling_ignored_during_execution.value["namespaces"]) ? required_during_scheduling_ignored_during_execution.value["namespaces"] : null
+                    topology_key = can(required_during_scheduling_ignored_during_execution.value["topology_key"]) ? required_during_scheduling_ignored_during_execution.value["topology_key"] : null
                   }
                 }
                 dynamic "preferred_during_scheduling_ignored_during_execution" {
-                  for_each = lookup(pod_affinity.value, "preferred_during_scheduling_ignored_during_execution", [])
+                  for_each = can(pod_affinity.value["preferred_during_scheduling_ignored_during_execution"]) ? pod_affinity.value["preferred_during_scheduling_ignored_during_execution"] : []
                   content {
                     dynamic "pod_affinity_term" {
-                      for_each = lookup(preferred_during_scheduling_ignored_during_execution.value, "pod_affinity_term", [])
+                      for_each = can(preferred_during_scheduling_ignored_during_execution.value["pod_affinity_term"]) ? preferred_during_scheduling_ignored_during_execution.value["pod_affinity_term"] : []
                       content {
                         dynamic "label_selector" {
-                          for_each = lookup(pod_affinity_term.value, "label_selector", [])
+                          for_each = can(pod_affinity_term.value["label_selector"]) ? pod_affinity_term.value["label_selector"] : []
                           content {
                             dynamic "match_expressions" {
-                              for_each = lookup(label_selector.value, "match_expressions", [])
+                              for_each = can(label_selector.value["match_expressions"]) ? label_selector.value["match_expressions"] : []
                               content {
-                                key      = lookup(match_expressions.value, "key", null)
-                                operator = lookup(match_expressions.value, "operator", null)
-                                values   = lookup(match_expressions.value, "values", null)
+                                key      = can(match_expressions.value["key"]) ? match_expressions.value["key"] : null
+                                operator = can(match_expressions.value["operator"]) ? match_expressions.value["operator"] : null
+                                values   = can(match_expressions.value["values"]) ? match_expressions.value["values"] : null
                               }
                             }
                           }
                         }
-                        namespaces   = lookup(pod_affinity_term.value, "namespaces", null)
-                        topology_key = lookup(pod_affinity_term.value, "topology_key", null)
+                        namespaces   = can(pod_affinity_term.value["namespaces"]) ? pod_affinity_term.value["namespaces"] : null
+                        topology_key = can(pod_affinity_term.value["topology_key"]) ? pod_affinity_term.value["topology_key"] : null
                       }
                     }
-                    weight = lookup(preferred_during_scheduling_ignored_during_execution.value, "weight", null)
+                    weight = can(preferred_during_scheduling_ignored_during_execution.value["weight"]) ? preferred_during_scheduling_ignored_during_execution.value["weight"] : null
                   }
                 }
               }
             }
             dynamic "pod_anti_affinity" {
-              for_each = lookup(affinity.value, "pod_anti_affinity", [])
+              for_each = can(affinity.value["pod_anti_affinity"]) ? affinity.value["pod_anti_affinity"] : []
               content {
                 dynamic "required_during_scheduling_ignored_during_execution" {
-                  for_each = lookup(pod_anti_affinity.value, "required_during_scheduling_ignored_during_execution", [])
+                  for_each = can(pod_anti_affinity.value["required_during_scheduling_ignored_during_execution"]) ? pod_anti_affinity.value["required_during_scheduling_ignored_during_execution"] : []
                   content {
                     dynamic "label_selector" {
-                      for_each = lookup(required_during_scheduling_ignored_during_execution.value, "label_selector", [])
+                      for_each = can(required_during_scheduling_ignored_during_execution.value["label_selector"]) ? required_during_scheduling_ignored_during_execution.value["label_selector"] : []
                       content {
                         dynamic "match_expressions" {
-                          for_each = lookup(label_selector.value, "match_expressions", [])
+                          for_each = can(label_selector.value["match_expressions"]) ? label_selector.value["match_expressions"] : []
                           content {
-                            key      = lookup(match_expressions.value, "key", null)
-                            operator = lookup(match_expressions.value, "operator", null)
-                            values   = lookup(match_expressions.value, "values", null)
+                            key      = can(match_expressions.value["key"]) ? match_expressions.value["key"] : null
+                            operator = can(match_expressions.value["operator"]) ? match_expressions.value["operator"] : null
+                            values   = can(match_expressions.value["values"]) ? match_expressions.value["values"] : null
                           }
                         }
                       }
                     }
-                    namespaces   = lookup(required_during_scheduling_ignored_during_execution.value, "namespaces", null)
-                    topology_key = lookup(required_during_scheduling_ignored_during_execution.value, "topology_key", null)
+                    namespaces   = can(required_during_scheduling_ignored_during_execution.value["namespaces"]) ? required_during_scheduling_ignored_during_execution.value["namespaces"] : null
+                    topology_key = can(required_during_scheduling_ignored_during_execution.value["topology_key"]) ? required_during_scheduling_ignored_during_execution.value["topology_key"] : null
                   }
                 }
                 dynamic "preferred_during_scheduling_ignored_during_execution" {
-                  for_each = lookup(pod_anti_affinity.value, "preferred_during_scheduling_ignored_during_execution", [])
+                  for_each = can(pod_anti_affinity.value["preferred_during_scheduling_ignored_during_execution"]) ? pod_anti_affinity.value["preferred_during_scheduling_ignored_during_execution"] : []
                   content {
                     dynamic "pod_affinity_term" {
-                      for_each = lookup(preferred_during_scheduling_ignored_during_execution.value, "pod_affinity_term", [])
+                      for_each = can(preferred_during_scheduling_ignored_during_execution.value["pod_affinity_term"]) ? preferred_during_scheduling_ignored_during_execution.value["pod_affinity_term"] : []
                       content {
                         dynamic "label_selector" {
-                          for_each = lookup(pod_affinity_term.value, "label_selector", [])
+                          for_each = can(pod_affinity_term.value["label_selector"]) ? pod_affinity_term.value["label_selector"] : []
                           content {
                             dynamic "match_expressions" {
-                              for_each = lookup(label_selector.value, "match_expressions", [])
+                              for_each = can(label_selector.value["match_expressions"]) ? label_selector.value["match_expressions"] : []
                               content {
-                                key      = lookup(match_expressions.value, "key", null)
-                                operator = lookup(match_expressions.value, "operator", null)
-                                values   = lookup(match_expressions.value, "values", null)
+                                key      = can(match_expressions.value["key"]) ? match_expressions.value["key"] : null
+                                operator = can(match_expressions.value["operator"]) ? match_expressions.value["operator"] : null
+                                values   = can(match_expressions.value["values"]) ? match_expressions.value["values"] : null
                               }
                             }
                           }
                         }
-                        namespaces   = lookup(pod_affinity_term.value, "namespaces", null)
-                        topology_key = lookup(pod_affinity_term.value, "topology_key", null)
+                        namespaces   = can(pod_affinity_term.value["namespaces"]) ? pod_affinity_term.value["namespaces"] : null
+                        topology_key = can(pod_affinity_term.value["topology_key"]) ? pod_affinity_term.value["topology_key"] : null
                       }
                     }
-                    weight = lookup(preferred_during_scheduling_ignored_during_execution.value, "weight", null)
+                    weight = can(preferred_during_scheduling_ignored_during_execution.value["weight"]) ? preferred_during_scheduling_ignored_during_execution.value["weight"] : null
                   }
                 }
               }
             }
           }
         }
+
         dynamic "init_container" {
-          for_each = var.init_container
+          for_each = var.deployment.init_container
           content {
-            args    = lookup(init_container.value, "args", null)
-            command = lookup(init_container.value, "command", null)
+            name              = "${local.resource_name}-init"
+            image             = init_container.value.image_repository != "" ? "${init_container.value.image_repository}:${init_container.value.image}" : "${local.general_image_repository}:${init_container.value.image}"
+            image_pull_policy = init_container.value.image_pull_policy
+            args              = init_container.value.args
+            command           = init_container.value.command
+            working_dir       = init_container.value.working_dir
             dynamic "env" {
-              for_each = lookup(init_container.value, "env", [])
+              for_each = init_container.value["env_variables"]
               content {
-                name  = lookup(env.value, "name", null)
-                value = lookup(env.value, "value", null)
+                name  = can(env.value["name"]) ? env.value["name"] : null
+                value = can(env.value["value"]) ? env.value["value"] : null
                 dynamic "value_from" {
-                  for_each = lookup(env.value, "value_from", [])
+                  for_each = can(env.value["value_from"]) ? env.value["value_from"] : []
                   content {
                     dynamic "config_map_key_ref" {
-                      for_each = lookup(value_from.value, "config_map_key_ref", [])
+                      for_each = can(value_from.value["config_map_key_ref"]) ? value_from.value["config_map_key_ref"] : []
                       content {
-                        key      = lookup(config_map_key_ref.value, "key", null)
-                        name     = lookup(config_map_key_ref.value, "name", null)
-                        optional = lookup(config_map_key_ref.value, "optional", null)
+                        key      = can(config_map_key_ref.value["key"]) ? config_map_key_ref.value["key"] : null
+                        name     = can(config_map_key_ref.value["name"]) ? config_map_key_ref.value["name"] : null
+                        optional = can(config_map_key_ref.value["optional"]) ? config_map_key_ref.value["optional"] : null
                       }
                     }
                     dynamic "field_ref" {
-                      for_each = lookup(value_from.value, "field_ref", [])
+                      for_each = can(value_from.value["field_ref"]) ? value_from.value["field_ref"] : []
                       content {
-                        api_version = lookup(field_ref.value, "api_version", null)
-                        field_path  = lookup(field_ref.value, "field_path", null)
+                        api_version = can(field_ref.value["api_version"]) ? field_ref.value["api_version"] : null
+                        field_path  = can(field_ref.value["field_path"]) ? field_ref.value["field_path"] : null
                       }
                     }
                     dynamic "resource_field_ref" {
-                      for_each = lookup(value_from.value, "resource_field_ref", [])
+                      for_each = can(value_from.value["resource_field_ref"]) ? value_from.value["resource_field_ref"] : []
                       content {
-                        container_name = lookup(resource_field_ref.value, "container_name", null)
-                        resource       = lookup(resource_field_ref.value, "resource", null)
-                        divisor        = lookup(resource_field_ref.value, "divisor", null)
+                        container_name = can(resource_field_ref.value["container_name"]) ? resource_field_ref.value["container_name"] : null
+                        resource       = can(resource_field_ref.value["resource"]) ? resource_field_ref.value["resource"] : null
+                        divisor        = can(resource_field_ref.value["divisor"]) ? resource_field_ref.value["divisor"] : null
                       }
                     }
                     dynamic "secret_key_ref" {
-                      for_each = lookup(value_from.value, "secret_key_ref", [])
+                      for_each = can(value_from.value["secret_key_ref"]) ? value_from.value["secret_key_ref"] : []
                       content {
-                        key      = lookup(secret_key_ref.value, "key", null)
-                        name     = lookup(secret_key_ref.value, "name", null)
-                        optional = lookup(secret_key_ref.value, "optional", null)
+                        key      = can(secret_key_ref.value["key"]) ? secret_key_ref.value["key"] : null
+                        name     = can(secret_key_ref.value["name"]) ? secret_key_ref.value["name"] : null
+                        optional = can(secret_key_ref.value["optional"]) ? secret_key_ref.value["optional"] : null
                       }
                     }
                   }
@@ -378,314 +307,292 @@ resource "kubernetes_deployment" "main" {
               }
             }
             dynamic "env_from" {
-              for_each = lookup(init_container.value, "env_from", [])
+              for_each = can(init_container.value["env_from"]) ? init_container.value["env_from"] : []
               content {
                 dynamic "config_map_ref" {
-                  for_each = lookup(env_from.value, "config_map_ref", [])
+                  for_each = can(env_from.value["config_map_ref"]) ? env_from.value["config_map_ref"] : []
                   content {
-                    name     = lookup(config_map_ref.value, "name", null)
-                    optional = lookup(config_map_ref.value, "optional", null)
+                    name     = can(config_map_ref.value["name"]) ? config_map_ref.value["name"] : null
+                    optional = can(config_map_ref.value["optional"]) ? config_map_ref.value["optional"] : null
                   }
                 }
-                prefix = lookup(env_from.value, "prefix", null)
+                prefix = can(env_from.value["prefix"]) ? env_from.value["prefix"] : null
                 dynamic "secret_ref" {
-                  for_each = lookup(env_from.value, "secret_ref", [])
+                  for_each = can(env_from.value["secret_ref"]) ? env_from.value["secret_ref"] : []
                   content {
-                    name     = lookup(secret_ref.value, "name", null)
-                    optional = lookup(secret_ref.value, "optional", null)
+                    name     = can(secret_ref.value["name"]) ? secret_ref.value["name"] : null
+                    optional = can(secret_ref.value["optional"]) ? secret_ref.value["optional"] : null
                   }
                 }
               }
             }
-            name              = lookup(init_container.value, "name", null) == null ? "${local.resource_name}-init" : "${local.resource_name}-init-${lookup(init_container.value, "name")}"
-            image             = lookup(init_container.value, "image", local.image)
-            image_pull_policy = lookup(init_container.value, "image_pull_policy", null)
-            dynamic "liveness_probe" {
-              for_each = lookup(init_container.value, "liveness_probe", [])
-              content {
-                dynamic "exec" {
-                  for_each = lookup(liveness_probe.value, "exec", [])
-                  content {
-                    command = lookup(exec.value, "name", null)
-                  }
-                }
-                failure_threshold = lookup(liveness_probe.value, "failure_threshold", null)
-                dynamic "http_get" {
-                  for_each = lookup(liveness_probe.value, "http_get", [])
-                  content {
-                    host = lookup(http_get.value, "host", null)
-                    dynamic "http_header" {
-                      for_each = lookup(http_get.value, "http_header", [])
-                      content {
-                        name  = lookup(http_header.value, "name", null)
-                        value = lookup(http_header.value, "value", null)
-                      }
-                    }
-                    path   = lookup(http_get.value, "path", null)
-                    port   = lookup(http_get.value, "port", null)
-                    scheme = lookup(http_get.value, "scheme", null)
-                  }
-                }
-                initial_delay_seconds = lookup(liveness_probe.value, "initial_delay_seconds", null)
-                period_seconds        = lookup(liveness_probe.value, "period_seconds", null)
-                success_threshold     = lookup(liveness_probe.value, "success_threshold", null)
-                dynamic "tcp_socket" {
-                  for_each = lookup(liveness_probe.value, "tcp_socket", [])
-                  content {
-                    port = lookup(tcp_socket.value, "port", null)
-                  }
-                }
-                timeout_seconds = lookup(liveness_probe.value, "timeout_seconds", null)
-              }
-            }
+
             dynamic "volume_mount" {
-              for_each = lookup(init_container.value, "volume_mount", [])
+              for_each = can(init_container.value["volume_mount"]) ? init_container.value["volume_mount"] : []
               content {
-                mount_path        = lookup(volume_mount.value, "mount_path", null)
-                name              = lookup(volume_mount.value, "name", null)
-                read_only         = lookup(volume_mount.value, "read_only", null)
-                sub_path          = lookup(volume_mount.value, "sub_path", null)
-                mount_propagation = lookup(volume_mount.value, "mount_propagation", null)
+                mount_path        = can(volume_mount.value["mount_path"]) ? volume_mount.value["mount_path"] : null
+                name              = can(volume_mount.value["name"]) ? volume_mount.value["name"] : null
+                read_only         = can(volume_mount.value["read_only"]) ? volume_mount.value["read_only"] : null
+                sub_path          = can(volume_mount.value["sub_path"]) ? volume_mount.value["sub_path"] : null
+                mount_propagation = can(volume_mount.value["mount_propagation"]) ? volume_mount.value["mount_propagation"] : null
               }
             }
 
-            working_dir = lookup(init_container.value, "working_dir", null)
-
-            dynamic "resources" {
-              for_each = lookup(init_container.value, "resources", [])
-              content {
-                limits   = lookup(resources.value, "limits", {})
-                requests = lookup(resources.value, "requests", {})
-              }
+            resources {
+              limits   = var.deployment.resource_limits
+              requests = var.deployment.resource_requests
             }
           }
         }
+
         dynamic "container" {
-          for_each = local.containers
+          for_each = var.deployment.containers
           content {
-            args    = lookup(container.value, "args", null)
-            command = lookup(container.value, "command", null)
+            name              = container.value["name"]
+            image             = container.value.image_repository != "" ? "${container.value.image_repository}:${container.value.image}" : "${local.general_image_repository}:${container.value.image}"
+            image_pull_policy = container.value["image_pull_policy"]
+            args              = container.value["args"]
+            command           = container.value["command"]
+            working_dir       = container.value["working_dir"]
+
             dynamic "env" {
-              for_each = lookup(container.value, "env", [])
+              for_each = container.value["env_variables"]
               content {
-                name  = lookup(env.value, "name", null)
-                value = lookup(env.value, "value", null)
+                name  = env.value["name"]
+                value = env.value["value"]
+
                 dynamic "value_from" {
-                  for_each = lookup(env.value, "value_from", [])
+                  for_each = can(env.value["value_from"]) ? env.value["value_from"] : []
                   content {
                     dynamic "config_map_key_ref" {
-                      for_each = lookup(value_from.value, "config_map_key_ref", [])
+                      for_each = can(value_from.value["config_map_key_ref"]) ? value_from.value["config_map_key_ref"] : []
                       content {
-                        key      = lookup(config_map_key_ref.value, "key", null)
-                        name     = lookup(config_map_key_ref.value, "name", null)
-                        optional = lookup(config_map_key_ref.value, "optional", null)
+                        key      = config_map_key_ref.value["key"]
+                        name     = config_map_key_ref.value["name"]
+                        optional = config_map_key_ref.value["optional"]
                       }
                     }
+
                     dynamic "field_ref" {
-                      for_each = lookup(value_from.value, "field_ref", [])
+                      for_each = can(value_from.value["field_ref"]) ? value_from.value["field_ref"] : []
                       content {
-                        api_version = lookup(field_ref.value, "api_version", null)
-                        field_path  = lookup(field_ref.value, "field_path", null)
+                        api_version = field_ref.value["api_version"]
+                        field_path  = field_ref.value["field_path"]
                       }
                     }
+
                     dynamic "resource_field_ref" {
-                      for_each = lookup(value_from.value, "resource_field_ref", [])
+                      for_each = can(value_from.value["resource_field_ref"]) ? value_from.value["resource_field_ref"] : []
                       content {
-                        container_name = lookup(resource_field_ref.value, "container_name", null)
-                        resource       = lookup(resource_field_ref.value, "resource", null)
-                        divisor        = lookup(resource_field_ref.value, "divisor", null)
+                        container_name = resource_field_ref.value["container_name"]
+                        resource       = resource_field_ref.value["resource"]
+                        divisor        = resource_field_ref.value["divisor"]
                       }
                     }
+
                     dynamic "secret_key_ref" {
-                      for_each = lookup(value_from.value, "secret_key_ref", [])
+                      for_each = can(value_from.value["secret_key_ref"]) ? value_from.value["secret_key_ref"] : []
                       content {
-                        key      = lookup(secret_key_ref.value, "key", null)
-                        name     = lookup(secret_key_ref.value, "name", null)
-                        optional = lookup(secret_key_ref.value, "optional", null)
+                        key      = secret_key_ref.value["key"]
+                        name     = secret_key_ref.value["name"]
+                        optional = secret_key_ref.value["optional"]
                       }
                     }
                   }
                 }
               }
             }
+
             dynamic "env_from" {
-              for_each = lookup(container.value, "env_from", [])
+              for_each = container.value["env_from"]
               content {
                 dynamic "config_map_ref" {
-                  for_each = lookup(env_from.value, "config_map_ref", [])
+                  for_each = can(env_from.value["config_map_ref"]) ? env_from.value["config_map_ref"] : []
                   content {
-                    name     = lookup(config_map_ref.value, "name", null)
-                    optional = lookup(config_map_ref.value, "optional", null)
+                    name     = config_map_ref.value["name"]
+                    optional = config_map_ref.value["optional"]
                   }
                 }
-                prefix = lookup(env_from.value, "prefix", null)
+
+                prefix = env_from.value["prefix"]
+
                 dynamic "secret_ref" {
-                  for_each = lookup(env_from.value, "secret_ref", [])
+                  for_each = can(env_from.value["secret_ref"]) ? env_from.value["secret_ref"] : []
                   content {
-                    name     = lookup(secret_ref.value, "name", null)
-                    optional = lookup(secret_ref.value, "optional", null)
+                    name     = secret_ref.value["name"]
+                    optional = secret_ref.value["optional"]
                   }
                 }
               }
             }
-            name              = lookup(container.value, "name", null) == null ? local.resource_name : "${local.resource_name}-${lookup(container.value, "name")}"
-            image             = lookup(container.value, "image", local.image)
-            image_pull_policy = lookup(container.value, "image_pull_policy", null)
+
             dynamic "liveness_probe" {
-              for_each = lookup(container.value, "liveness_probe", [])
+              for_each = can(container.value["liveness_probe"]) ? container.value["liveness_probe"] : []
               content {
                 dynamic "exec" {
-                  for_each = lookup(liveness_probe.value, "exec", [])
+                  for_each = can(liveness_probe.value["exec"]) ? liveness_probe.value["exec"] : []
                   content {
-                    command = lookup(exec.value, "name", null)
+                    command = exec.value["name"]
                   }
                 }
-                failure_threshold = lookup(liveness_probe.value, "failure_threshold", null)
+                failure_threshold     = can(liveness_probe.value["failure_threshold"]) ? liveness_probe.value["failure_threshold"] : null
+                initial_delay_seconds = can(liveness_probe.value["initial_delay_seconds"]) ? liveness_probe.value["initial_delay_seconds"] : null
+                period_seconds        = can(liveness_probe.value["period_seconds"]) ? liveness_probe.value["period_seconds"] : null
+                success_threshold     = can(liveness_probe.value["success_threshold"]) ? liveness_probe.value["success_threshold"] : null
+
                 dynamic "http_get" {
-                  for_each = lookup(liveness_probe.value, "http_get", [])
+                  for_each = can(liveness_probe.value["http_get"]) ? liveness_probe.value["http_get"] : []
                   content {
-                    host = lookup(http_get.value, "host", null)
+                    host   = can(http_get.value["host"]) ? http_get.value["host"] : null
+                    path   = can(http_get.value["path"]) ? http_get.value["path"] : null
+                    port   = can(http_get.value["port"]) ? http_get.value["port"] : null
+                    scheme = can(http_get.value["scheme"]) ? http_get.value["scheme"] : null
+
                     dynamic "http_header" {
-                      for_each = lookup(http_get.value, "http_header", [])
+                      for_each = can(http_get.value["http_header"]) ? http_get.value["http_header"] : []
                       content {
-                        name  = lookup(http_header.value, "name", null)
-                        value = lookup(http_header.value, "value", null)
+                        name  = can(http_header.value["name"]) ? http_header.value["name"] : null
+                        value = can(http_header.value["value"]) ? http_header.value["value"] : null
                       }
                     }
-                    path   = lookup(http_get.value, "path", null)
-                    port   = lookup(http_get.value, "port", null)
-                    scheme = lookup(http_get.value, "scheme", null)
                   }
                 }
-                initial_delay_seconds = lookup(liveness_probe.value, "initial_delay_seconds", null)
-                period_seconds        = lookup(liveness_probe.value, "period_seconds", null)
-                success_threshold     = lookup(liveness_probe.value, "success_threshold", null)
+
                 dynamic "tcp_socket" {
-                  for_each = lookup(liveness_probe.value, "tcp_socket", [])
+                  for_each = can(liveness_probe.value["tcp_socket"]) ? liveness_probe.value["tcp_socket"] : []
                   content {
-                    port = lookup(tcp_socket.value, "port", null)
+                    port = can(tcp_socket.value["port"]) ? tcp_socket.value["port"] : null
                   }
                 }
-                timeout_seconds = lookup(liveness_probe.value, "timeout_seconds", null)
+
+                timeout_seconds = can(liveness_probe.value["timeout_seconds"]) ? liveness_probe.value["timeout_seconds"] : null
               }
             }
+
             dynamic "readiness_probe" {
-              for_each = lookup(container.value, "readiness_probe", [])
+              for_each = can(container.value["readiness_probe"]) ? container.value["readiness_probe"] : []
               content {
                 dynamic "exec" {
-                  for_each = lookup(readiness_probe.value, "exec", [])
+                  for_each = can(readiness_probe.value["exec"]) ? readiness_probe.value["exec"] : []
                   content {
-                    command = lookup(exec.value, "name", null)
+                    command = can(exec.value["name"]) ? exec.value["name"] : null
                   }
                 }
-                failure_threshold = lookup(readiness_probe.value, "failure_threshold", null)
+                failure_threshold     = can(readiness_probe.value["failure_threshold"]) ? readiness_probe.value["failure_threshold"] : null
+                initial_delay_seconds = can(readiness_probe.value["initial_delay_seconds"]) ? readiness_probe.value["initial_delay_seconds"] : null
+                period_seconds        = can(readiness_probe.value["period_seconds"]) ? readiness_probe.value["period_seconds"] : null
+                success_threshold     = can(readiness_probe.value["success_threshold"]) ? readiness_probe.value["success_threshold"] : null
+
                 dynamic "http_get" {
-                  for_each = lookup(readiness_probe.value, "http_get", [])
+                  for_each = can(readiness_probe.value["http_get"]) ? readiness_probe.value["http_get"] : []
                   content {
-                    host = lookup(http_get.value, "host", null)
+                    host   = can(http_get.value["host"]) ? http_get.value["host"] : null
+                    path   = can(http_get.value["path"]) ? http_get.value["path"] : null
+                    port   = can(http_get.value["port"]) ? http_get.value["port"] : null
+                    scheme = can(http_get.value["scheme"]) ? http_get.value["scheme"] : null
+
                     dynamic "http_header" {
-                      for_each = lookup(http_get.value, "http_header", [])
+                      for_each = can(http_get.value["http_header"]) ? http_get.value["http_header"] : []
                       content {
-                        name  = lookup(http_header.value, "name", null)
-                        value = lookup(http_header.value, "value", null)
+                        name  = can(http_header.value["name"]) ? http_header.value["name"] : null
+                        value = can(http_header.value["value"]) ? http_header.value["value"] : null
                       }
                     }
-                    path   = lookup(http_get.value, "path", null)
-                    port   = lookup(http_get.value, "port", null)
-                    scheme = lookup(http_get.value, "scheme", null)
                   }
                 }
-                initial_delay_seconds = lookup(readiness_probe.value, "initial_delay_seconds", null)
-                period_seconds        = lookup(readiness_probe.value, "period_seconds", null)
-                success_threshold     = lookup(readiness_probe.value, "success_threshold", null)
+
                 dynamic "tcp_socket" {
-                  for_each = lookup(readiness_probe.value, "tcp_socket", [])
+                  for_each = can(readiness_probe.value["tcp_socket"]) ? readiness_probe.value["tcp_socket"] : []
                   content {
-                    port = lookup(tcp_socket.value, "port", null)
+                    port = can(tcp_socket.value["port"]) ? tcp_socket.value["port"] : null
                   }
                 }
-                timeout_seconds = lookup(readiness_probe.value, "timeout_seconds", null)
+
+                timeout_seconds = can(readiness_probe.value["timeout_seconds"]) ? readiness_probe.value["timeout_seconds"] : null
               }
             }
+
             dynamic "volume_mount" {
-              for_each = lookup(container.value, "volume_mount", [])
+              for_each = can(container.value["volume_mount"]) ? container.value["volume_mount"] : []
               content {
-                mount_path        = lookup(volume_mount.value, "mount_path", null)
-                name              = lookup(volume_mount.value, "name", null)
-                read_only         = lookup(volume_mount.value, "read_only", null)
-                sub_path          = lookup(volume_mount.value, "sub_path", null)
-                mount_propagation = lookup(volume_mount.value, "mount_propagation", null)
+                mount_path        = can(volume_mount.value["mount_path"]) ? volume_mount.value["mount_path"] : null
+                name              = can(volume_mount.value["name"]) ? volume_mount.value["name"] : null
+                read_only         = can(volume_mount.value["read_only"]) ? volume_mount.value["read_only"] : null
+                sub_path          = can(volume_mount.value["sub_path"]) ? volume_mount.value["sub_path"] : null
+                mount_propagation = can(volume_mount.value["mount_propagation"]) ? volume_mount.value["mount_propagation"] : null
               }
             }
 
-            working_dir = lookup(container.value, "working_dir", null)
-
-            dynamic "resources" {
-              for_each = lookup(container.value, "resources", [])
-              content {
-                limits   = lookup(resources.value, "limits", null)
-                requests = lookup(resources.value, "requests", null)
-              }
+            resources {
+              limits   = var.deployment.resource_limits
+              requests = var.deployment.resource_requests
             }
           }
         }
+
+
         dynamic "volume" {
-          for_each = var.volume
+          for_each = var.deployment.volumes
+
           content {
-            dynamic "aws_elastic_block_store" {
-              for_each = lookup(volume.value, "aws_elastic_block_store", [])
+            name = can(volume.value["name"]) ? volume.value["name"] : null
+
+            dynamic "secret" {
+              for_each = can(volume.value["secret"]) ? volume.value["secret"] : []
+
               content {
-                fs_type   = lookup(aws_elastic_block_store.value, "fs_type", null)
-                partition = lookup(aws_elastic_block_store.value, "partition", null)
-                read_only = lookup(aws_elastic_block_store.value, "read_only", null)
-                volume_id = lookup(aws_elastic_block_store.value, "volume_id", null)
+                default_mode = can(secret.value["default_mode"]) ? secret.value["default_mode"] : null
+                optional     = can(secret.value["optional"]) ? secret.value["optional"] : null
+                secret_name  = can(secret.value["secret_name"]) ? secret.value["secret_name"] : null
+
+                dynamic "items" {
+                  for_each = can(secret.value["items"]) ? secret.value["items"] : []
+                  content {
+                    key  = can(items.value["key"]) ? items.value["key"] : null
+                    mode = can(items.value["mode"]) ? items.value["mode"] : null
+                    path = can(items.value["path"]) ? items.value["path"] : null
+                  }
+                }
+              }
+            }
+
+            dynamic "aws_elastic_block_store" {
+              for_each = can(volume.value["aws_elastic_block_store"]) ? volume.value["aws_elastic_block_store"] : []
+              content {
+                fs_type   = can(aws_elastic_block_store.value["fs_type"]) ? aws_elastic_block_store.value["fs_type"] : null
+                partition = can(aws_elastic_block_store.value["partition"]) ? aws_elastic_block_store.value["partition"] : null
+                read_only = can(aws_elastic_block_store.value["read_only"]) ? aws_elastic_block_store.value["read_only"] : null
+                volume_id = can(aws_elastic_block_store.value["volume_id"]) ? aws_elastic_block_store.value["volume_id"] : null
               }
             }
             dynamic "config_map" {
-              for_each = lookup(volume.value, "config_map", [])
+              for_each = can(volume.value["config_map"]) ? volume.value["config_map"] : []
               content {
-                default_mode = lookup(config_map.value, "default_mode", null)
+                default_mode = can(config_map.value["default_mode"]) ? config_map.value["default_mode"] : null
                 dynamic "items" {
-                  for_each = lookup(config_map.value, "items", [])
+                  for_each = can(config_map.value["items"]) ? config_map.value["items"] : []
                   content {
-                    key  = lookup(items.value, "key", null)
-                    mode = lookup(items.value, "mode", null)
-                    path = lookup(items.value, "path", null)
+                    key  = can(items.value["key"]) ? items.value["key"] : null
+                    mode = can(items.value["mode"]) ? items.value["mode"] : null
+                    path = can(items.value["path"]) ? items.value["path"] : null
                   }
                 }
-                optional = lookup(config_map.value, "optional", null)
-                name     = lookup(config_map.value, "name", null)
+                optional = can(config_map.value["optional"]) ? config_map.value["optional"] : null
+                name     = can(config_map.value["name"]) ? config_map.value["name"] : null
               }
             }
             dynamic "empty_dir" {
-              for_each = lookup(volume.value, "empty_dir", [])
+              for_each = can(volume.value["empty_dir"]) ? volume.value["empty_dir"] : []
               content {
-                medium     = lookup(empty_dir.value, "medium", null)
-                size_limit = lookup(empty_dir.value, "size_limit", null)
+                medium     = can(empty_dir.value["medium"]) ? empty_dir.value["medium"] : null
+                size_limit = can(empty_dir.value["size_limit"]) ? empty_dir.value["size_limit"] : null
               }
             }
-            name = lookup(volume.value, "name", null)
             dynamic "persistent_volume_claim" {
-              for_each = lookup(volume.value, "persistent_volume_claim", [])
+              for_each = can(volume.value["persistent_volume_claim"]) ? volume.value["persistent_volume_claim"] : []
               content {
-                claim_name = lookup(persistent_volume_claim.value, "claim_name", null)
-                read_only  = lookup(persistent_volume_claim.value, "read_only", null)
-              }
-            }
-            dynamic "secret" {
-              for_each = lookup(volume.value, "secret", [])
-              content {
-                default_mode = lookup(secret.value, "default_mode", null)
-                dynamic "items" {
-                  for_each = lookup(secret.value, "items", [])
-                  content {
-                    key  = lookup(items.value, "key", null)
-                    mode = lookup(items.value, "mode", null)
-                    path = lookup(items.value, "path", null)
-                  }
-                }
-                optional    = lookup(secret.value, "optional", null)
-                secret_name = lookup(secret.value, "secret_name", null)
+                claim_name = can(persistent_volume_claim.value["claim_name"]) ? persistent_volume_claim.value["claim_name"] : null
+                read_only  = can(persistent_volume_claim.value["read_only"]) ? persistent_volume_claim.value["read_only"] : null
               }
             }
           }
@@ -700,10 +607,11 @@ resource "kubernetes_deployment" "main" {
       spec[0].template[0].spec[0].init_container[0].image,
       spec[0].template[0].spec[0].container[0].image,
       spec[0].template[0].spec[0].container[1].image,
+      spec[0].template[0].spec[0].container[2].image,
     ]
   }
 
-  wait_for_rollout = var.wait_for_rollout
+  wait_for_rollout = var.deployment.wait_for_rollout
 
   depends_on = [
     aws_ecr_lifecycle_policy.main
@@ -714,29 +622,29 @@ resource "kubernetes_deployment" "main" {
 # Kubernetes Service
 ################################################################################
 resource "kubernetes_service" "main" {
-  count = var.svc_create ? 1 : 0
+  count = var.deployment.create_svc ? 1 : 0
 
   metadata {
-    annotations = var.svc_annotations
+    annotations = var.deployment.svc_annotations
     name        = local.resource_name
-    namespace   = var.namespace
+    namespace   = var.deployment.namespace
 
     labels = local.svc_labels
   }
 
   spec {
     port {
-      port        = var.svc_port
-      target_port = var.svc_port
-      protocol    = var.svc_protocol
+      port        = var.deployment.svc_port
+      target_port = var.deployment.svc_port
+      protocol    = var.deployment.svc_protocol
     }
 
     selector = {
       app = local.resource_name
     }
 
-    type                = var.svc_type
-    load_balancer_class = var.svc_load_balancer_class
+    type                = var.deployment.svc_type
+    load_balancer_class = var.deployment.svc_load_balancer_class
   }
 
   depends_on = [
@@ -748,20 +656,20 @@ resource "kubernetes_service" "main" {
 # ServiceMonitor (Prometheus-Operator)
 ################################################################################
 resource "kubectl_manifest" "main" {
-  count = var.svc_create && var.svc_monitor_create ? 1 : 0
+  count = var.deployment.create_svc && var.deployment.create_svc_monitor ? 1 : 0
 
   yaml_body = <<YAML
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: ${local.resource_name}
-  namespace: ${var.namespace}
+  namespace: ${var.deployment.namespace}
 spec:
   selector:
     matchLabels:
       app: ${local.resource_name}
   endpoints:
-    - path: "${var.svc_monitor_path}"
+    - path: "${var.deployment.svc_monitor_path}"
 YAML
 
   depends_on = [
