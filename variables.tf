@@ -11,11 +11,11 @@ variable "deployment" {
     volumes           = optional(any, [])
     resource_limits   = optional(object({ cpu = string, memory = string }))
     resource_requests = optional(object({ cpu = string, memory = string }))
-    image_repository  = optional(string, "")
     wait_for_rollout  = optional(bool, false)
 
     init_container = optional(list(object({
       name              = string
+      image_repository  = optional(string, "")
       image             = optional(string, "")
       image_pull_policy = optional(string, "IfNotPresent")
       env_from          = optional(list(map(any)), [])
@@ -28,6 +28,7 @@ variable "deployment" {
     containers = list(object({
       name              = string
       image             = optional(string, "")
+      image_repository  = optional(string, "")
       image_pull_policy = optional(string, "IfNotPresent")
       liveness_probe    = optional(any, [])
       readiness_probe   = optional(any, [])
@@ -42,7 +43,6 @@ variable "deployment" {
     create_ecr               = optional(bool, false)
     ecr_scan_on_push         = optional(bool, true)
     ecr_encryption_type      = optional(string, "KMS")
-    ecr_allowed_aws_accounts = optional(list(string), [])
 
     create_svc              = optional(bool, true)
     create_svc_monitor      = optional(bool, false)
@@ -54,6 +54,12 @@ variable "deployment" {
     svc_load_balancer_class = optional(string)
     svc_monitor_path        = optional(string, "/metrics")
   })
+}
+
+variable "image_repository" {
+  type        = string
+  description = "General repository from where to pull container images from. Specific repositories may still be defined on the respective containers."
+  default     = ""
 }
 
 variable "strategy_type" {
