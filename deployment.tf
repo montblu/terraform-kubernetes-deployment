@@ -534,6 +534,7 @@ resource "kubernetes_deployment" "main" {
       spec[0].template[0].spec[0].init_container[0].image,
       spec[0].template[0].spec[0].container[0].image,
       spec[0].template[0].spec[0].container[1].image,
+      spec[0].template[0].spec[0].container[2].image,
     ]
   }
 
