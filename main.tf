@@ -1,3 +1,76 @@
+locals {
+  resource_name = "${var.deployment.prefix}-${var.deployment.name}"
+
+  base_labels = {
+    app = local.resource_name
+  }
+
+  labels = merge(local.base_labels, var.deployment.labels)
+
+  general_image_repository = var.deployment.create_ecr ? aws_ecr_repository.main[0].repository_url : (var.image_repository != "" ? var.image_repository : "")
+
+  svc_labels = merge(local.base_labels, var.deployment.svc_labels)
+}
+
+################################################################################
+# ECR Repository
+################################################################################
+resource "aws_ecr_repository" "main" {
+  count = var.deployment.create_ecr ? 1 : 0
+
+  name = local.resource_name
+
+  image_scanning_configuration {
+    scan_on_push = var.deployment.ecr_scan_on_push
+  }
+
+  encryption_configuration {
+    encryption_type = var.deployment.ecr_encryption_type
+  }
+
+}
+
+resource "aws_ecr_lifecycle_policy" "main" {
+  count = var.deployment.create_ecr ? 1 : 0
+
+  repository = aws_ecr_repository.main[0].name
+  policy     = var.ecr_lifecycle_policy
+}
+
+# allow pull from all other accounts
+data "aws_iam_policy_document" "main" {
+  count = var.deployment.create_ecr && length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0
+
+  dynamic "statement" {
+    for_each = var.ecr_allowed_aws_accounts
+    content {
+      sid    = "Pull only for ${statement.value}"
+      effect = "Allow"
+      principals {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${statement.value}:root"
+        ]
+      }
+      actions = [
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "ecr:BatchCheckLayerAvailability",
+      ]
+    }
+  }
+}
+
+resource "aws_ecr_repository_policy" "main" {
+  count = var.deployment.create_ecr && length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0
+
+  repository = aws_ecr_repository.main[0].name
+  policy     = data.aws_iam_policy_document.main[0].json
+}
+
+################################################################################
+# Kubernetes Deployment
+################################################################################
 resource "kubernetes_deployment" "main" {
   metadata {
     name      = local.resource_name
@@ -542,5 +615,64 @@ resource "kubernetes_deployment" "main" {
 
   depends_on = [
     aws_ecr_lifecycle_policy.main
+  ]
+}
+
+################################################################################
+# Kubernetes Service
+################################################################################
+resource "kubernetes_service" "main" {
+  count = var.deployment.create_svc ? 1 : 0
+
+  metadata {
+    annotations = var.deployment.svc_annotations
+    name        = local.resource_name
+    namespace   = var.deployment.namespace
+
+    labels = local.svc_labels
+  }
+
+  spec {
+    port {
+      port        = var.deployment.svc_port
+      target_port = var.deployment.svc_port
+      protocol    = var.deployment.svc_protocol
+    }
+
+    selector = {
+      app = local.resource_name
+    }
+
+    type                = var.deployment.svc_type
+    load_balancer_class = var.deployment.svc_load_balancer_class
+  }
+
+  depends_on = [
+    kubernetes_deployment.main
+  ]
+}
+
+################################################################################
+# ServiceMonitor (Prometheus-Operator)
+################################################################################
+resource "kubectl_manifest" "main" {
+  count = var.deployment.create_svc && var.deployment.create_svc_monitor ? 1 : 0
+
+  yaml_body = <<YAML
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ${local.resource_name}
+  namespace: ${var.deployment.namespace}
+spec:
+  selector:
+    matchLabels:
+      app: ${local.resource_name}
+  endpoints:
+    - path: "${var.deployment.svc_monitor_path}"
+YAML
+
+  depends_on = [
+    kubernetes_service.main
   ]
 }
