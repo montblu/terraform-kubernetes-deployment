@@ -30,19 +30,63 @@ variable "deployment" {
       image             = optional(string, "")
       image_repository  = optional(string, "")
       image_pull_policy = optional(string, "IfNotPresent")
-      liveness_probe    = optional(any, [])
-      readiness_probe   = optional(any, [])
       env_from          = optional(list(map(any)), [])
       volume_mount      = optional(list(map(any)), [])
       command           = optional(list(string), [])
       args              = optional(list(string), [])
       working_dir       = optional(string)
       env_variables     = optional(list(map(any)), [])
+      liveness_probe = optional(list(object({
+        failure_threshold     = optional(number)
+        initial_delay_seconds = optional(number)
+        period_seconds        = optional(number)
+        success_threshold     = optional(number)
+        timeout_seconds       = optional(number)
+        exec = optional(list(object({
+          command = optional(list(string))
+        })), [])
+        http_get = optional(list(object({
+          host   = optional(string)
+          path   = optional(string)
+          port   = optional(number)
+          scheme = optional(string)
+          http_header = optional(list(object({
+            name  = optional(string)
+            value = optional(string)
+          })), [])
+        })), [])
+        tcp_socket = optional(list(object({
+          port = optional(number)
+        })), [])
+      })), [])
+      readiness_probe = optional(list(object({
+        failure_threshold     = optional(number)
+        initial_delay_seconds = optional(number)
+        period_seconds        = optional(number)
+        success_threshold     = optional(number)
+        timeout_seconds       = optional(number)
+        exec = optional(list(object({
+          command = optional(list(string))
+        })), [])
+        http_get = optional(list(object({
+          host   = optional(string)
+          path   = optional(string)
+          port   = optional(number)
+          scheme = optional(string)
+          http_header = optional(list(object({
+            name  = optional(string)
+            value = optional(string)
+          })), [])
+        })), [])
+        tcp_socket = optional(list(object({
+          port = optional(number)
+        })), [])
+      })), [])
     }))
 
-    create_ecr               = optional(bool, false)
-    ecr_scan_on_push         = optional(bool, true)
-    ecr_encryption_type      = optional(string, "KMS")
+    create_ecr          = optional(bool, false)
+    ecr_scan_on_push    = optional(bool, true)
+    ecr_encryption_type = optional(string, "KMS")
 
     create_svc              = optional(bool, true)
     create_svc_monitor      = optional(bool, false)

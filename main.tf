@@ -429,17 +429,18 @@ resource "kubernetes_deployment" "main" {
             dynamic "liveness_probe" {
               for_each = can(container.value["liveness_probe"]) ? container.value["liveness_probe"] : []
               content {
-                dynamic "exec" {
-                  for_each = can(liveness_probe.value["exec"]) ? liveness_probe.value["exec"] : []
-                  content {
-                    command = exec.value["name"]
-                  }
-                }
+
                 failure_threshold     = can(liveness_probe.value["failure_threshold"]) ? liveness_probe.value["failure_threshold"] : null
                 initial_delay_seconds = can(liveness_probe.value["initial_delay_seconds"]) ? liveness_probe.value["initial_delay_seconds"] : null
                 period_seconds        = can(liveness_probe.value["period_seconds"]) ? liveness_probe.value["period_seconds"] : null
                 success_threshold     = can(liveness_probe.value["success_threshold"]) ? liveness_probe.value["success_threshold"] : null
-
+                timeout_seconds       = can(liveness_probe.value["timeout_seconds"]) ? liveness_probe.value["timeout_seconds"] : null
+                dynamic "exec" {
+                  for_each = can(liveness_probe.value["exec"]) ? liveness_probe.value["exec"] : []
+                  content {
+                    command = can(exec.value["command"]) ? exec.value["command"] : null
+                  }
+                }
                 dynamic "http_get" {
                   for_each = can(liveness_probe.value["http_get"]) ? liveness_probe.value["http_get"] : []
                   content {
@@ -464,25 +465,24 @@ resource "kubernetes_deployment" "main" {
                     port = can(tcp_socket.value["port"]) ? tcp_socket.value["port"] : null
                   }
                 }
-
-                timeout_seconds = can(liveness_probe.value["timeout_seconds"]) ? liveness_probe.value["timeout_seconds"] : null
               }
             }
 
             dynamic "readiness_probe" {
               for_each = can(container.value["readiness_probe"]) ? container.value["readiness_probe"] : []
               content {
-                dynamic "exec" {
-                  for_each = can(readiness_probe.value["exec"]) ? readiness_probe.value["exec"] : []
-                  content {
-                    command = can(exec.value["name"]) ? exec.value["name"] : null
-                  }
-                }
+
                 failure_threshold     = can(readiness_probe.value["failure_threshold"]) ? readiness_probe.value["failure_threshold"] : null
                 initial_delay_seconds = can(readiness_probe.value["initial_delay_seconds"]) ? readiness_probe.value["initial_delay_seconds"] : null
                 period_seconds        = can(readiness_probe.value["period_seconds"]) ? readiness_probe.value["period_seconds"] : null
                 success_threshold     = can(readiness_probe.value["success_threshold"]) ? readiness_probe.value["success_threshold"] : null
-
+                timeout_seconds       = can(readiness_probe.value["timeout_seconds"]) ? readiness_probe.value["timeout_seconds"] : null
+                dynamic "exec" {
+                  for_each = can(readiness_probe.value["exec"]) ? readiness_probe.value["exec"] : []
+                  content {
+                    command = can(exec.value["command"]) ? exec.value["command"] : null
+                  }
+                }
                 dynamic "http_get" {
                   for_each = can(readiness_probe.value["http_get"]) ? readiness_probe.value["http_get"] : []
                   content {
@@ -500,15 +500,12 @@ resource "kubernetes_deployment" "main" {
                     }
                   }
                 }
-
                 dynamic "tcp_socket" {
                   for_each = can(readiness_probe.value["tcp_socket"]) ? readiness_probe.value["tcp_socket"] : []
                   content {
                     port = can(tcp_socket.value["port"]) ? tcp_socket.value["port"] : null
                   }
                 }
-
-                timeout_seconds = can(readiness_probe.value["timeout_seconds"]) ? readiness_probe.value["timeout_seconds"] : null
               }
             }
 
