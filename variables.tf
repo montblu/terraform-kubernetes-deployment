@@ -13,6 +13,11 @@ variable "deployment" {
     resource_requests = optional(object({ cpu = string, memory = string }))
     wait_for_rollout  = optional(bool, false)
 
+    host_aliases = optional(list(object({
+      ip = optional(string, "")
+      hostnames = optional(list(string),[])
+    })), [])
+
     init_container = optional(list(object({
       name              = string
       image_repository  = optional(string, "")

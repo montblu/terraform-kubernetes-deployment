@@ -254,6 +254,15 @@ resource "kubernetes_deployment" "main" {
           }
         }
 
+        dynamic "host_aliases" {
+          for_each = var.deployment.host_aliases
+
+          content {
+            ip = host_aliases.value.ip
+            hostnames = host_aliases.value.hostnames
+          }
+        }
+
         dynamic "init_container" {
           for_each = var.deployment.init_container
           content {
