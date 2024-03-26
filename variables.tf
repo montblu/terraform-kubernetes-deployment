@@ -9,8 +9,8 @@ variable "deployment" {
     replicas          = optional(number, 1)
     affinity          = optional(list(map(any)), [])
     volumes           = optional(any, [])
-    resource_limits   = optional(object({ cpu = string, memory = string }))
-    resource_requests = optional(object({ cpu = string, memory = string }))
+    resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }))
+    resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }))
     wait_for_rollout  = optional(bool, false)
 
     host_aliases = optional(list(object({
@@ -29,6 +29,8 @@ variable "deployment" {
       args              = optional(list(string), [])
       working_dir       = optional(string)
       env_variables     = optional(list(map(any)), [])
+      resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }))
+      resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }))
     })), [])
     containers = list(object({
       name              = string
@@ -41,6 +43,8 @@ variable "deployment" {
       args              = optional(list(string), [])
       working_dir       = optional(string)
       env_variables     = optional(list(map(any)), [])
+      resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }))
+      resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }))
       liveness_probe = optional(list(object({
         failure_threshold     = optional(number)
         initial_delay_seconds = optional(number)
