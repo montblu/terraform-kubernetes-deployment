@@ -28,7 +28,7 @@ variable "deployment" {
       command           = optional(list(string), [])
       args              = optional(list(string), [])
       working_dir       = optional(string)
-      env_variables     = optional(list(map(any)), [])
+      env               = optional(list(map(any)), [])
     })), [])
     containers = list(object({
       name              = string
@@ -40,7 +40,7 @@ variable "deployment" {
       command           = optional(list(string), [])
       args              = optional(list(string), [])
       working_dir       = optional(string)
-      env_variables     = optional(list(map(any)), [])
+      env               = optional(list(map(any)), [])
       liveness_probe = optional(list(object({
         failure_threshold     = optional(number)
         initial_delay_seconds = optional(number)
