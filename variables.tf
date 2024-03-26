@@ -14,8 +14,8 @@ variable "deployment" {
     wait_for_rollout  = optional(bool, false)
 
     host_aliases = optional(list(object({
-      ip = optional(string, "")
-      hostnames = optional(list(string),[])
+      ip        = optional(string, "")
+      hostnames = optional(list(string), [])
     })), [])
 
     init_container = optional(list(object({

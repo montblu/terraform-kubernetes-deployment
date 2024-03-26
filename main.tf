@@ -258,7 +258,7 @@ resource "kubernetes_deployment" "main" {
           for_each = var.deployment.host_aliases
 
           content {
-            ip = host_aliases.value.ip
+            ip        = host_aliases.value.ip
             hostnames = host_aliases.value.hostnames
           }
         }
