@@ -102,7 +102,7 @@ variable "deployment" {
       protocol    = optional(string, "TCP")
       port        = optional(number, 80)
       target_port = optional(number)
-    })), [{ name = "Default" }])
+    })), [{ name = "http" }])
     svc_type                = optional(string, "ClusterIP")
     svc_load_balancer_class = optional(string)
     svc_monitor_path        = optional(string, "/metrics")
