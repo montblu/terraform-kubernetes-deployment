@@ -258,7 +258,7 @@ resource "kubernetes_deployment" "main" {
           for_each = var.deployment.host_aliases
 
           content {
-            ip = host_aliases.value.ip
+            ip        = host_aliases.value.ip
             hostnames = host_aliases.value.hostnames
           }
         }
@@ -639,10 +639,14 @@ resource "kubernetes_service" "main" {
   }
 
   spec {
-    port {
-      port        = var.deployment.svc_port
-      target_port = var.deployment.svc_port
-      protocol    = var.deployment.svc_protocol
+    dynamic "port" {
+      for_each = var.deployment.svc_ports
+      content {
+        name        = port.value["name"]
+        protocol    = port.value["protocol"]
+        port        = port.value["port"]
+        target_port = port.value["target_port"] != null ? port.value["target_port"] : port.value["port"]
+      }
     }
 
     selector = {

@@ -14,8 +14,8 @@ variable "deployment" {
     wait_for_rollout  = optional(bool, false)
 
     host_aliases = optional(list(object({
-      ip = optional(string, "")
-      hostnames = optional(list(string),[])
+      ip        = optional(string, "")
+      hostnames = optional(list(string), [])
     })), [])
 
     init_container = optional(list(object({
@@ -93,12 +93,16 @@ variable "deployment" {
     ecr_scan_on_push    = optional(bool, true)
     ecr_encryption_type = optional(string, "KMS")
 
-    create_svc              = optional(bool, true)
-    create_svc_monitor      = optional(bool, false)
-    svc_annotations         = optional(map(any), {})
-    svc_labels              = optional(map(string), {})
-    svc_port                = optional(number, 80)
-    svc_protocol            = optional(string, "TCP")
+    create_svc         = optional(bool, true)
+    create_svc_monitor = optional(bool, false)
+    svc_annotations    = optional(map(any), {})
+    svc_labels         = optional(map(string), {})
+    svc_ports = optional(list(object({
+      name        = optional(string)
+      protocol    = optional(string, "TCP")
+      port        = optional(number, 80)
+      target_port = optional(number)
+    })), [{ name = "Default" }])
     svc_type                = optional(string, "ClusterIP")
     svc_load_balancer_class = optional(string)
     svc_monitor_path        = optional(string, "/metrics")
