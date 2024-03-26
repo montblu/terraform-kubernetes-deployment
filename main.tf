@@ -348,8 +348,8 @@ resource "kubernetes_deployment" "main" {
             }
 
             resources {
-              limits   = var.deployment.resource_limits
-              requests = var.deployment.resource_requests
+              limits   = can(init_container.value["resource_limits"]) ? init_container.value["resource_limits"] : var.deployment.resource_limits
+              requests = can(init_container.value["resource_requests"]) ? init_container.value["resource_requests"] : var.deployment.resource_requests
             }
           }
         }
@@ -530,8 +530,8 @@ resource "kubernetes_deployment" "main" {
             }
 
             resources {
-              limits   = var.deployment.resource_limits
-              requests = var.deployment.resource_requests
+              limits   = can(container.value["resource_limits"]) ? container.value["resource_limits"] : var.deployment.resource_limits
+              requests = can(container.value["resource_requests"]) ? container.value["resource_requests"] : var.deployment.resource_requests
             }
           }
         }
