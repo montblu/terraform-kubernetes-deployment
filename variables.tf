@@ -28,7 +28,7 @@ variable "deployment" {
       command           = optional(list(string), [])
       args              = optional(list(string), [])
       working_dir       = optional(string)
-      env_variables     = optional(list(map(any)), [])
+      env               = optional(list(map(any)), [])
       resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }))
       resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }))
     })), [])
@@ -42,7 +42,7 @@ variable "deployment" {
       command           = optional(list(string), [])
       args              = optional(list(string), [])
       working_dir       = optional(string)
-      env_variables     = optional(list(map(any)), [])
+      env               = optional(list(map(any)), [])
       resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }))
       resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }))
       liveness_probe = optional(list(object({
