@@ -273,7 +273,7 @@ resource "kubernetes_deployment" "main" {
             command           = init_container.value.command
             working_dir       = init_container.value.working_dir
             dynamic "env" {
-              for_each = init_container.value["env_variables"]
+              for_each = init_container.value["env"]
               content {
                 name  = can(env.value["name"]) ? env.value["name"] : null
                 value = can(env.value["value"]) ? env.value["value"] : null
@@ -365,7 +365,7 @@ resource "kubernetes_deployment" "main" {
             working_dir       = container.value["working_dir"]
 
             dynamic "env" {
-              for_each = container.value["env_variables"]
+              for_each = container.value["env"]
               content {
                 name  = env.value["name"]
                 value = env.value["value"]
@@ -639,10 +639,14 @@ resource "kubernetes_service" "main" {
   }
 
   spec {
-    port {
-      port        = var.deployment.svc_port
-      target_port = var.deployment.svc_port
-      protocol    = var.deployment.svc_protocol
+    dynamic "port" {
+      for_each = var.deployment.svc_ports
+      content {
+        name        = port.value["name"]
+        protocol    = port.value["protocol"]
+        port        = port.value["port"]
+        target_port = port.value["target_port"] != null ? port.value["target_port"] : port.value["port"]
+      }
     }
 
     selector = {
