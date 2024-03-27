@@ -348,8 +348,8 @@ resource "kubernetes_deployment" "main" {
             }
 
             resources {
-              limits   = var.deployment.resource_limits
-              requests = var.deployment.resource_requests
+              limits   = init_container.value["resource_limits"]
+              requests = init_container.value["resource_requests"]
             }
           }
         }
@@ -530,8 +530,8 @@ resource "kubernetes_deployment" "main" {
             }
 
             resources {
-              limits   = var.deployment.resource_limits
-              requests = var.deployment.resource_requests
+              limits   = container.value["resource_limits"]
+              requests = container.value["resource_requests"]
             }
           }
         }
