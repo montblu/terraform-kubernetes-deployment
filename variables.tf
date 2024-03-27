@@ -9,10 +9,7 @@ variable "deployment" {
     replicas          = optional(number, 1)
     affinity          = optional(list(map(any)), [])
     volumes           = optional(any, [])
-    resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }))
-    resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }))
     wait_for_rollout  = optional(bool, false)
-
     host_aliases = optional(list(object({
       ip        = optional(string, "")
       hostnames = optional(list(string), [])
@@ -32,6 +29,7 @@ variable "deployment" {
       resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }), null)
       resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }), null)
     })), [])
+
     containers = list(object({
       name              = string
       image             = optional(string, "")
