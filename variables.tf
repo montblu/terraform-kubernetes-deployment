@@ -1,21 +1,18 @@
 variable "deployment" {
   description = "Kubernetes deployment configuration"
   type = object({
-    name              = string
-    prefix            = optional(string)
-    namespace         = string
-    annotations       = optional(map(string), {})
-    labels            = optional(map(string), {})
-    replicas          = optional(number, 1)
-    affinity          = optional(list(map(any)), [])
-    volumes           = optional(any, [])
-    resource_limits   = optional(object({ cpu = string, memory = string }))
-    resource_requests = optional(object({ cpu = string, memory = string }))
-    wait_for_rollout  = optional(bool, false)
-
+    name             = string
+    prefix           = optional(string)
+    namespace        = string
+    annotations      = optional(map(string), {})
+    labels           = optional(map(string), {})
+    replicas         = optional(number, 1)
+    affinity         = optional(list(map(any)), [])
+    volumes          = optional(any, [])
+    wait_for_rollout = optional(bool, false)
     host_aliases = optional(list(object({
-      ip = optional(string, "")
-      hostnames = optional(list(string),[])
+      ip        = optional(string, "")
+      hostnames = optional(list(string), [])
     })), [])
 
     init_container = optional(list(object({
@@ -28,8 +25,11 @@ variable "deployment" {
       command           = optional(list(string), [])
       args              = optional(list(string), [])
       working_dir       = optional(string)
-      env_variables     = optional(list(map(any)), [])
+      env               = optional(list(map(any)), [])
+      resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }), null)
+      resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }), null)
     })), [])
+
     containers = list(object({
       name              = string
       image             = optional(string, "")
@@ -40,7 +40,9 @@ variable "deployment" {
       command           = optional(list(string), [])
       args              = optional(list(string), [])
       working_dir       = optional(string)
-      env_variables     = optional(list(map(any)), [])
+      env               = optional(list(map(any)), [])
+      resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }), null)
+      resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }), null)
       liveness_probe = optional(list(object({
         failure_threshold     = optional(number)
         initial_delay_seconds = optional(number)
@@ -93,12 +95,16 @@ variable "deployment" {
     ecr_scan_on_push    = optional(bool, true)
     ecr_encryption_type = optional(string, "KMS")
 
-    create_svc              = optional(bool, true)
-    create_svc_monitor      = optional(bool, false)
-    svc_annotations         = optional(map(any), {})
-    svc_labels              = optional(map(string), {})
-    svc_port                = optional(number, 80)
-    svc_protocol            = optional(string, "TCP")
+    create_svc         = optional(bool, true)
+    create_svc_monitor = optional(bool, false)
+    svc_annotations    = optional(map(any), {})
+    svc_labels         = optional(map(string), {})
+    svc_ports = optional(list(object({
+      name        = optional(string)
+      protocol    = optional(string, "TCP")
+      port        = optional(number, 80)
+      target_port = optional(number)
+    })), [{ name = "http" }])
     svc_type                = optional(string, "ClusterIP")
     svc_load_balancer_class = optional(string)
     svc_monitor_path        = optional(string, "/metrics")
