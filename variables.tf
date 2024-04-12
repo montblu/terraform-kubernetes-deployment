@@ -140,46 +140,52 @@ variable "ecr_lifecycle_policy" {
   description = "Sets the lifecycle policy of the ECR. If set `ecr_number_of_images_to_keep` won't work."
   default     = <<EOF
 {
-    "rules": [
-        {
-            "rulePriority": 1,
-            "description": "Keep untagged images for 1 week",
-            "selection": {
-                "tagStatus": "untagged",
-                "countType": "sinceImagePushed",
-                "countUnit": "days",
-                "countNumber": 7
-            },
-            "action": {
-                "type": "expire"
-            }
-        },
-        {
-            "rulePriority": 2,
-            "description": "Keep last 30 images (Main)",
-            "selection": {
-                "tagStatus": "tagged",
-                "tagPrefixList": ["main"],
-                "countType": "imageCountMoreThan",
-                "countNumber": 30
-            },
-            "action": {
-                "type": "expire"
-            }
-        },
-        {
-            "rulePriority": 3,
-            "description": "Keep last 10 images (All except Main)",
-            "selection": {
-                "tagStatus": "any",
-                "countType": "imageCountMoreThan",
-                "countNumber": 10
-            },
-            "action": {
-                "type": "expire"
-            }
-        }
-    ]
+  "rules": [
+    {
+      "rulePriority": 1,
+      "description": "Keep last 50 images (master,main)",
+      "selection": {
+        "tagStatus": "tagged",
+        "tagPatternList": [
+          "master-*",
+          "main-*"
+        ],
+        "countType": "imageCountMoreThan",
+        "countNumber": 50
+      },
+      "action": {
+        "type": "expire"
+      }
+    },
+    {
+      "rulePriority": 2,
+      "description": "Keep last 30 images (develop)",
+      "selection": {
+        "tagStatus": "tagged",
+        "tagPatternList": [
+          "develop-*"
+        ],
+        "countType": "imageCountMoreThan",
+        "countNumber": 30
+      },
+      "action": {
+        "type": "expire"
+      }
+    },
+    {
+      "rulePriority": 3,
+      "description": "Keep last 10 images of the branches images",
+      "selection": {
+        "tagStatus": "any",
+        "countType": "imageCountMoreThan",
+        "countNumber": 10
+      },
+      "action": {
+        "type": "expire"
+      }
+    }
+  ]
 }
+
 EOF
 }
