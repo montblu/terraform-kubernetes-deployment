@@ -18,7 +18,7 @@ variable "deployment" {
     init_container = optional(list(object({
       name              = string
       image_repository  = optional(string, "")
-      image             = optional(string, "")
+      image_tag         = optional(string, "")
       image_pull_policy = optional(string, "IfNotPresent")
       env_from          = optional(any, [])
       volume_mount      = optional(list(map(any)), [])
@@ -32,7 +32,7 @@ variable "deployment" {
 
     containers = list(object({
       name              = string
-      image             = optional(string, "")
+      image_tag         = optional(string, "")
       image_repository  = optional(string, "")
       image_pull_policy = optional(string, "IfNotPresent")
       env_from          = optional(any, [])
