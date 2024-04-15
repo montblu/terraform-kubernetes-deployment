@@ -418,18 +418,18 @@ resource "kubernetes_deployment" "main" {
                 dynamic "config_map_ref" {
                   for_each = can(env_from.value["config_map_ref"]) ? env_from.value["config_map_ref"] : []
                   content {
-                    name     = can(config_map_ref.value["name"]) ? config_map_ref.value["name"] : []
-                    optional = can(config_map_ref.value["optional"]) ? config_map_ref.value["optional"] : []
+                    name     = can(config_map_ref.value["name"]) ? config_map_ref.value["name"] : null
+                    optional = can(config_map_ref.value["optional"]) ? config_map_ref.value["optional"] : null
                   }
                 }
 
-                prefix = can(env_from.value["prefix"]) ? env_from.value["prefix"] : []
+                prefix = can(env_from.value["prefix"]) ? env_from.value["prefix"] : null
 
                 dynamic "secret_ref" {
                   for_each = can(env_from.value["secret_ref"]) ? env_from.value["secret_ref"] : []
                   content {
-                    name     = can(secret_ref.value["name"]) ? secret_ref.value["name"] : []
-                    optional = can(secret_ref.value["optional"]) ? secret_ref.value["optional"] : []
+                    name     = can(secret_ref.value["name"]) ? secret_ref.value["name"] : null
+                    optional = can(secret_ref.value["optional"]) ? secret_ref.value["optional"] : null
                   }
                 }
               }
