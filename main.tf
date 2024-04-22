@@ -601,6 +601,30 @@ resource "kubernetes_deployment" "main" {
                 read_only  = can(persistent_volume_claim.value["read_only"]) ? persistent_volume_claim.value["read_only"] : null
               }
             }
+
+            dynamic "ephemeral" {
+              for_each = can(volume.value["ephemeral"]) ? volume.value["ephemeral"] : []
+              content {
+                dynamic "volume_claim_template" {
+                  for_each = can(ephemeral.value["volume_claim_template"]) ? ephemeral.value["volume_claim_template"] : []
+                  content {
+                    dynamic "spec" {
+                      for_each = can(volume_claim_template.value["spec"]) ? volume_claim_template.value["spec"] : []
+                      content {
+                        access_modes       = can(spec.value["access_modes"]) ? spec.value["access_modes"] : null
+                        storage_class_name = can(spec.value["storage_class_name"]) ? spec.value["storage_class_name"] : null
+                        dynamic "resources" {
+                          for_each = can(spec.value["resources"]) ? spec.value["resources"] : []
+                          content {
+                            requests = can(resources.value["requests"]) ? resources.value["requests"] : null
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
