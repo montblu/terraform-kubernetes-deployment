@@ -28,6 +28,7 @@ variable "deployment" {
       env               = optional(list(map(any)), [])
       resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }), null)
       resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }), null)
+      lifecycle         = optional(any, [])
     })), [])
 
     containers = list(object({
@@ -43,6 +44,7 @@ variable "deployment" {
       env               = optional(list(map(any)), [])
       resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }), null)
       resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }), null)
+      lifecycle         = optional(any, [])
       liveness_probe = optional(list(object({
         failure_threshold     = optional(number)
         initial_delay_seconds = optional(number)
