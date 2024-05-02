@@ -91,6 +91,7 @@ variable "deployment" {
       })), [])
     }))
 
+    create              = optional(bool, true)
     create_ecr          = optional(bool, false)
     ecr_scan_on_push    = optional(bool, true)
     ecr_encryption_type = optional(string, "KMS")
