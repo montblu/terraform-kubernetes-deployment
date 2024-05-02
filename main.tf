@@ -338,6 +338,83 @@ resource "kubernetes_deployment" "main" {
               }
             }
 
+            dynamic "lifecycle" {
+              for_each = can(init_container.value["lifecycle"]) ? init_container.value["lifecycle"] : []
+              content {
+                dynamic "post_start" {
+                  for_each = can(lifecycle.value["post_start"]) ? lifecycle.value["post_start"] : []
+                  content {
+                    dynamic "exec" {
+                      for_each = can(post_start.value["exec"]) ? post_start.value["exec"] : []
+                      content {
+                        command = can(exec.value["command"]) ? exec.value["command"] : null
+                      }
+                    }
+                    dynamic "http_get" {
+                      for_each = can(post_start.value["http_get"]) ? post_start.value["http_get"] : []
+                      content {
+                        host = can(http_get.value["host"]) ? http_get.value["host"] : null
+
+                        dynamic "http_header" {
+                          for_each = can(http_get.value["http_header"]) ? http_get.value["http_header"] : []
+                          content {
+                            name  = can(http_header.value["name"]) ? http_header.value["name"] : null
+                            value = can(http_header.value["value"]) ? http_header.value["value"] : null
+                          }
+                        }
+
+                        path   = can(http_get.value["path"]) ? http_get.value["path"] : null
+                        port   = can(http_get.value["port"]) ? http_get.value["port"] : null
+                        scheme = can(http_get.value["scheme"]) ? http_get.value["scheme"] : null
+                      }
+                    }
+                    dynamic "tcp_socket" {
+                      for_each = can(post_start.value["tcp_socket"]) ? post_start.value["tcp_socket"] : []
+                      content {
+                        port = can(tcp_socket.value["port"]) ? tcp_socket.value["port"] : null
+                      }
+                    }
+                  }
+                }
+
+                dynamic "pre_stop" {
+                  for_each = can(lifecycle.value["post_start"]) ? lifecycle.value["post_start"] : []
+                  content {
+                    dynamic "exec" {
+                      for_each = can(pre_stop.value["exec"]) ? pre_stop.value["exec"] : []
+                      content {
+                        command = can(exec.value["command"]) ? exec.value["command"] : null
+                      }
+                    }
+                    dynamic "http_get" {
+                      for_each = can(pre_stop.value["http_get"]) ? pre_stop.value["http_get"] : []
+                      content {
+                        host = can(http_get.value["host"]) ? http_get.value["host"] : null
+
+                        dynamic "http_header" {
+                          for_each = can(http_get.value["http_header"]) ? http_get.value["http_header"] : []
+                          content {
+                            name  = can(http_header.value["name"]) ? http_header.value["name"] : null
+                            value = can(http_header.value["value"]) ? http_header.value["value"] : null
+                          }
+                        }
+
+                        path   = can(http_get.value["path"]) ? http_get.value["path"] : null
+                        port   = can(http_get.value["port"]) ? http_get.value["port"] : null
+                        scheme = can(http_get.value["scheme"]) ? http_get.value["scheme"] : null
+                      }
+                    }
+                    dynamic "tcp_socket" {
+                      for_each = can(pre_stop.value["tcp_socket"]) ? pre_stop.value["tcp_socket"] : []
+                      content {
+                        port = can(tcp_socket.value["port"]) ? tcp_socket.value["port"] : null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
             dynamic "volume_mount" {
               for_each = can(init_container.value["volume_mount"]) ? init_container.value["volume_mount"] : []
               content {
@@ -432,6 +509,83 @@ resource "kubernetes_deployment" "main" {
                   content {
                     name     = can(secret_ref.value["name"]) ? secret_ref.value["name"] : null
                     optional = can(secret_ref.value["optional"]) ? secret_ref.value["optional"] : null
+                  }
+                }
+              }
+            }
+
+            dynamic "lifecycle" {
+              for_each = can(init_container.value["lifecycle"]) ? init_container.value["lifecycle"] : []
+              content {
+                dynamic "post_start" {
+                  for_each = can(lifecycle.value["post_start"]) ? lifecycle.value["post_start"] : []
+                  content {
+                    dynamic "exec" {
+                      for_each = can(post_start.value["exec"]) ? post_start.value["exec"] : []
+                      content {
+                        command = can(exec.value["command"]) ? exec.value["command"] : null
+                      }
+                    }
+                    dynamic "http_get" {
+                      for_each = can(post_start.value["http_get"]) ? post_start.value["http_get"] : []
+                      content {
+                        host = can(http_get.value["host"]) ? http_get.value["host"] : null
+
+                        dynamic "http_header" {
+                          for_each = can(http_get.value["http_header"]) ? http_get.value["http_header"] : []
+                          content {
+                            name  = can(http_header.value["name"]) ? http_header.value["name"] : null
+                            value = can(http_header.value["value"]) ? http_header.value["value"] : null
+                          }
+                        }
+
+                        path   = can(http_get.value["path"]) ? http_get.value["path"] : null
+                        port   = can(http_get.value["port"]) ? http_get.value["port"] : null
+                        scheme = can(http_get.value["scheme"]) ? http_get.value["scheme"] : null
+                      }
+                    }
+                    dynamic "tcp_socket" {
+                      for_each = can(post_start.value["tcp_socket"]) ? post_start.value["tcp_socket"] : []
+                      content {
+                        port = can(tcp_socket.value["port"]) ? tcp_socket.value["port"] : null
+                      }
+                    }
+                  }
+                }
+
+                dynamic "pre_stop" {
+                  for_each = can(lifecycle.value["post_start"]) ? lifecycle.value["post_start"] : []
+                  content {
+                    dynamic "exec" {
+                      for_each = can(pre_stop.value["exec"]) ? pre_stop.value["exec"] : []
+                      content {
+                        command = can(exec.value["command"]) ? exec.value["command"] : null
+                      }
+                    }
+                    dynamic "http_get" {
+                      for_each = can(pre_stop.value["http_get"]) ? pre_stop.value["http_get"] : []
+                      content {
+                        host = can(http_get.value["host"]) ? http_get.value["host"] : null
+
+                        dynamic "http_header" {
+                          for_each = can(http_get.value["http_header"]) ? http_get.value["http_header"] : []
+                          content {
+                            name  = can(http_header.value["name"]) ? http_header.value["name"] : null
+                            value = can(http_header.value["value"]) ? http_header.value["value"] : null
+                          }
+                        }
+
+                        path   = can(http_get.value["path"]) ? http_get.value["path"] : null
+                        port   = can(http_get.value["port"]) ? http_get.value["port"] : null
+                        scheme = can(http_get.value["scheme"]) ? http_get.value["scheme"] : null
+                      }
+                    }
+                    dynamic "tcp_socket" {
+                      for_each = can(pre_stop.value["tcp_socket"]) ? pre_stop.value["tcp_socket"] : []
+                      content {
+                        port = can(tcp_socket.value["port"]) ? tcp_socket.value["port"] : null
+                      }
+                    }
                   }
                 }
               }
