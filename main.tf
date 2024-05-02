@@ -16,7 +16,7 @@ locals {
 # ECR Repository
 ################################################################################
 resource "aws_ecr_repository" "main" {
-  count = var.deployment.create_ecr ? 1 : 0
+  count = var.deployment.create && var.deployment.create_ecr ? 1 : 0
 
   name = local.resource_name
 
@@ -31,7 +31,7 @@ resource "aws_ecr_repository" "main" {
 }
 
 resource "aws_ecr_lifecycle_policy" "main" {
-  count = var.deployment.create_ecr ? 1 : 0
+  count = var.deployment.create && var.deployment.create_ecr ? 1 : 0
 
   repository = aws_ecr_repository.main[0].name
   policy     = var.ecr_lifecycle_policy
@@ -39,7 +39,7 @@ resource "aws_ecr_lifecycle_policy" "main" {
 
 # allow pull from all other accounts
 data "aws_iam_policy_document" "main" {
-  count = var.deployment.create_ecr && length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0
+  count = var.deployment.create && var.deployment.create_ecr && length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0
 
   dynamic "statement" {
     for_each = var.ecr_allowed_aws_accounts
@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "main" {
 }
 
 resource "aws_ecr_repository_policy" "main" {
-  count = var.deployment.create_ecr && length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0
+  count = var.deployment.create && var.deployment.create_ecr && length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0
 
   repository = aws_ecr_repository.main[0].name
   policy     = data.aws_iam_policy_document.main[0].json
@@ -72,6 +72,8 @@ resource "aws_ecr_repository_policy" "main" {
 # Kubernetes Deployment
 ################################################################################
 resource "kubernetes_deployment" "main" {
+  count = var.deployment.create ? 1 : 0
+
   metadata {
     name      = local.resource_name
     namespace = var.deployment.namespace
@@ -652,7 +654,7 @@ resource "kubernetes_deployment" "main" {
 # Kubernetes Service
 ################################################################################
 resource "kubernetes_service" "main" {
-  count = var.deployment.create_svc ? 1 : 0
+  count = var.deployment.create && var.deployment.create_svc ? 1 : 0
 
   metadata {
     annotations = var.deployment.svc_annotations
@@ -690,7 +692,7 @@ resource "kubernetes_service" "main" {
 # ServiceMonitor (Prometheus-Operator)
 ################################################################################
 resource "kubectl_manifest" "main" {
-  count = var.deployment.create_svc && var.deployment.create_svc_monitor ? 1 : 0
+  count = var.deployment.create && var.deployment.create_svc && var.deployment.create_svc_monitor ? 1 : 0
 
   yaml_body = <<YAML
 apiVersion: monitoring.coreos.com/v1
