@@ -515,7 +515,7 @@ resource "kubernetes_deployment" "main" {
             }
 
             dynamic "lifecycle" {
-              for_each = can(init_container.value["lifecycle"]) ? init_container.value["lifecycle"] : []
+              for_each = can(container.value["lifecycle"]) ? container.value["lifecycle"] : []
               content {
                 dynamic "post_start" {
                   for_each = can(lifecycle.value["post_start"]) ? lifecycle.value["post_start"] : []
