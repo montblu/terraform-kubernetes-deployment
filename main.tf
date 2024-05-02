@@ -378,7 +378,7 @@ resource "kubernetes_deployment" "main" {
                 }
 
                 dynamic "pre_stop" {
-                  for_each = can(lifecycle.value["post_start"]) ? lifecycle.value["post_start"] : []
+                  for_each = can(lifecycle.value["pre_stop"]) ? lifecycle.value["pre_stop"] : []
                   content {
                     dynamic "exec" {
                       for_each = can(pre_stop.value["exec"]) ? pre_stop.value["exec"] : []
@@ -554,7 +554,7 @@ resource "kubernetes_deployment" "main" {
                 }
 
                 dynamic "pre_stop" {
-                  for_each = can(lifecycle.value["post_start"]) ? lifecycle.value["post_start"] : []
+                  for_each = can(lifecycle.value["pre_stop"]) ? lifecycle.value["pre_stop"] : []
                   content {
                     dynamic "exec" {
                       for_each = can(pre_stop.value["exec"]) ? pre_stop.value["exec"] : []
