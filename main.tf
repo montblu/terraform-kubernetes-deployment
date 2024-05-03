@@ -692,6 +692,7 @@ resource "kubernetes_deployment" "main" {
           }
         }
 
+        termination_grace_period_seconds = can(var.deployment.termination_grace_period_seconds) ? var.deployment.termination_grace_period_seconds : null
 
         dynamic "volume" {
           for_each = var.deployment.volumes
