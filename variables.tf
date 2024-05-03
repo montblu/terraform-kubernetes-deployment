@@ -93,6 +93,8 @@ variable "deployment" {
       })), [])
     }))
 
+    termination_grace_period_seconds = optional(number)
+
     create              = optional(bool, true)
     create_ecr          = optional(bool, false)
     ecr_scan_on_push    = optional(bool, true)
