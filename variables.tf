@@ -1,15 +1,16 @@
 variable "deployment" {
   description = "Kubernetes deployment configuration"
   type = object({
-    name             = string
-    prefix           = optional(string)
-    namespace        = string
-    annotations      = optional(map(string), {})
-    labels           = optional(map(string), {})
-    replicas         = optional(number, 1)
-    affinity         = optional(list(map(any)), [])
-    volumes          = optional(any, [])
-    wait_for_rollout = optional(bool, false)
+    name                      = string
+    prefix                    = optional(string)
+    namespace                 = string
+    annotations               = optional(map(string), {})
+    labels                    = optional(map(string), {})
+    replicas                  = optional(number, 1)
+    progress_deadline_seconds = optional(number, 600)
+    affinity                  = optional(list(map(any)), [])
+    volumes                   = optional(any, [])
+    wait_for_rollout          = optional(bool, false)
     host_aliases = optional(list(object({
       ip        = optional(string, "")
       hostnames = optional(list(string), [])

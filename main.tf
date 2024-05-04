@@ -83,7 +83,8 @@ resource "kubernetes_deployment" "main" {
   }
 
   spec {
-    replicas = var.deployment.replicas
+    progress_deadline_seconds = var.deployment.progress_deadline_seconds
+    replicas                  = var.deployment.replicas
     strategy {
       type = var.strategy_type
 
