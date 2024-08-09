@@ -450,10 +450,10 @@ resource "kubernetes_deployment" "main" {
                 dynamic "se_linux_options" {
                   for_each = can(security_context.value["se_linux_options"]) ? security_context.value["se_linux_options"] : []
                   content {
-                    level = can(se_linux_options.value["level"]) ? se_linux_options.value["level"] : []
-                    role  = can(se_linux_options.value["role"]) ? se_linux_options.value["role"] : []
-                    type  = can(se_linux_options.value["type"]) ? se_linux_options.value["type"] : []
-                    user  = can(se_linux_options.value["user"]) ? se_linux_options.value["user"] : []
+                    level = can(se_linux_options.value["level"]) ? se_linux_options.value["level"] : null
+                    role  = can(se_linux_options.value["role"]) ? se_linux_options.value["role"] : null
+                    type  = can(se_linux_options.value["type"]) ? se_linux_options.value["type"] : null
+                    user  = can(se_linux_options.value["user"]) ? se_linux_options.value["user"] : null
                   }
                 }
                 dynamic "seccomp_profile" {
@@ -743,10 +743,10 @@ resource "kubernetes_deployment" "main" {
                 dynamic "se_linux_options" {
                   for_each = can(security_context.value["se_linux_options"]) ? security_context.value["se_linux_options"] : []
                   content {
-                    level = can(se_linux_options.value["level"]) ? se_linux_options.value["level"] : []
-                    role  = can(se_linux_options.value["role"]) ? se_linux_options.value["role"] : []
-                    type  = can(se_linux_options.value["type"]) ? se_linux_options.value["type"] : []
-                    user  = can(se_linux_options.value["user"]) ? se_linux_options.value["user"] : []
+                    level = can(se_linux_options.value["level"]) ? se_linux_options.value["level"] : null
+                    role  = can(se_linux_options.value["role"]) ? se_linux_options.value["role"] : null
+                    type  = can(se_linux_options.value["type"]) ? se_linux_options.value["type"] : null
+                    user  = can(se_linux_options.value["user"]) ? se_linux_options.value["user"] : null
                   }
                 }
                 dynamic "seccomp_profile" {
