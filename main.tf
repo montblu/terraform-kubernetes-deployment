@@ -724,6 +724,40 @@ resource "kubernetes_deployment" "main" {
               limits   = container.value["resource_limits"]
               requests = container.value["resource_requests"]
             }
+
+            dynamic "security_context" {
+              for_each = can(container.value["security_context"]) ? container.value["security_context"] : []
+              content {
+                allow_privilege_escalation = can(security_context.value["allow_privilege_escalation"]) ? security_context.value["allow_privilege_escalation"] : null
+                dynamic "capabilities" {
+                  for_each = can(security_context.value["capabilities"]) ? security_context.value["capabilities"] : []
+                  content {
+                    add  = can(capabilities.value["add"]) ? capabilities.value["add"] : null
+                    drop = can(capabilities.value["drop"]) ? capabilities.value["drop"] : null
+                  }
+                }
+                privileged      = can(security_context.value["privileged"]) ? security_context.value["privileged"] : null
+                run_as_group    = can(security_context.value["run_as_group"]) ? security_context.value["run_as_group"] : null
+                run_as_non_root = can(security_context.value["run_as_non_root"]) ? security_context.value["run_as_non_root"] : null
+                run_as_user     = can(security_context.value["run_as_user"]) ? security_context.value["run_as_user"] : null
+                dynamic "se_linux_options" {
+                  for_each = can(security_context.value["se_linux_options"]) ? security_context.value["se_linux_options"] : []
+                  content {
+                    level = can(se_linux_options.value["level"]) ? se_linux_options.value["level"] : []
+                    role  = can(se_linux_options.value["role"]) ? se_linux_options.value["role"] : []
+                    type  = can(se_linux_options.value["type"]) ? se_linux_options.value["type"] : []
+                    user  = can(se_linux_options.value["user"]) ? se_linux_options.value["user"] : []
+                  }
+                }
+                dynamic "seccomp_profile" {
+                  for_each = can(security_context.value["seccomp_profile"]) ? security_context.value["seccomp_profile"] : []
+                  content {
+                    localhost_profile = can(seccomp_profile.value["localhost_profile"]) ? seccomp_profile.value["localhost_profile"] : null
+                    type              = can(seccomp_profile.value["type"]) ? seccomp_profile.value["type"] : null
+                  }
+                }
+              }
+            }
           }
         }
 
