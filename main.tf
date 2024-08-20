@@ -443,10 +443,11 @@ resource "kubernetes_deployment" "main" {
                     drop = can(capabilities.value["drop"]) ? capabilities.value["drop"] : null
                   }
                 }
-                privileged      = can(security_context.value["privileged"]) ? security_context.value["privileged"] : null
-                run_as_group    = can(security_context.value["run_as_group"]) ? security_context.value["run_as_group"] : null
-                run_as_non_root = can(security_context.value["run_as_non_root"]) ? security_context.value["run_as_non_root"] : null
-                run_as_user     = can(security_context.value["run_as_user"]) ? security_context.value["run_as_user"] : null
+                privileged                = can(security_context.value["privileged"]) ? security_context.value["privileged"] : null
+                read_only_root_filesystem = can(security_context.value["read_only_root_filesystem"]) ? security_context.value["read_only_root_filesystem"] : null
+                run_as_group              = can(security_context.value["run_as_group"]) ? security_context.value["run_as_group"] : null
+                run_as_non_root           = can(security_context.value["run_as_non_root"]) ? security_context.value["run_as_non_root"] : null
+                run_as_user               = can(security_context.value["run_as_user"]) ? security_context.value["run_as_user"] : null
                 dynamic "se_linux_options" {
                   for_each = can(security_context.value["se_linux_options"]) ? security_context.value["se_linux_options"] : []
                   content {
@@ -736,10 +737,11 @@ resource "kubernetes_deployment" "main" {
                     drop = can(capabilities.value["drop"]) ? capabilities.value["drop"] : null
                   }
                 }
-                privileged      = can(security_context.value["privileged"]) ? security_context.value["privileged"] : null
-                run_as_group    = can(security_context.value["run_as_group"]) ? security_context.value["run_as_group"] : null
-                run_as_non_root = can(security_context.value["run_as_non_root"]) ? security_context.value["run_as_non_root"] : null
-                run_as_user     = can(security_context.value["run_as_user"]) ? security_context.value["run_as_user"] : null
+                privileged                = can(security_context.value["privileged"]) ? security_context.value["privileged"] : null
+                read_only_root_filesystem = can(security_context.value["read_only_root_filesystem"]) ? security_context.value["read_only_root_filesystem"] : null
+                run_as_group              = can(security_context.value["run_as_group"]) ? security_context.value["run_as_group"] : null
+                run_as_non_root           = can(security_context.value["run_as_non_root"]) ? security_context.value["run_as_non_root"] : null
+                run_as_user               = can(security_context.value["run_as_user"]) ? security_context.value["run_as_user"] : null
                 dynamic "se_linux_options" {
                   for_each = can(security_context.value["se_linux_options"]) ? security_context.value["se_linux_options"] : []
                   content {
