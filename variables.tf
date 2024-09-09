@@ -30,6 +30,7 @@ variable "deployment" {
       resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }), null)
       resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }), null)
       lifecycle         = optional(any, [])
+      security_context = optional(any, [])
     })), [])
 
     containers = list(object({
@@ -92,6 +93,7 @@ variable "deployment" {
           port = optional(number)
         })), [])
       })), [])
+      security_context = optional(any, [])
     }))
 
     termination_grace_period_seconds = optional(number)
