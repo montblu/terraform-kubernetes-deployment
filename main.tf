@@ -269,7 +269,7 @@ resource "kubernetes_deployment" "main" {
         dynamic "init_container" {
           for_each = var.deployment.init_container
           content {
-            name              = "${local.resource_name}-init"
+            name              = init_container.value.name
             image             = init_container.value.image_repository != "" ? "${init_container.value.image_repository}:${init_container.value.image_tag}" : "${local.general_image_repository}:${init_container.value.image_tag}"
             image_pull_policy = init_container.value.image_pull_policy
             args              = init_container.value.args
