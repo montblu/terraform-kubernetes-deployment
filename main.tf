@@ -917,10 +917,10 @@ resource "kubernetes_service" "main" {
 ################################################################################
 # ServiceMonitor (Prometheus-Operator)
 ################################################################################
-resource "kubectl_manifest" "main" {
+resource "kubernetes_manifest" "main" {
   count = var.deployment.create && var.deployment.create_svc && var.deployment.create_svc_monitor ? 1 : 0
 
-  yaml_body = <<YAML
+  manifest = yamldecode(<<YAML
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -933,6 +933,7 @@ spec:
   endpoints:
     - path: "${var.deployment.svc_monitor_path}"
 YAML
+  )
 
   depends_on = [
     kubernetes_service.main
