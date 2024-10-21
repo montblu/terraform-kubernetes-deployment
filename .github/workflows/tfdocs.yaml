@@ -1,0 +1,12 @@
+name: Generate Tfdocs
+on:
+  - pull_request
+
+jobs:
+ module_matrix:
+   strategy:
+      matrix:
+         module: ["../."]
+   uses: montblu/github-actions/.github/workflows/tfdocs.yaml@main
+   with:
+     target: ${{ matrix.module }}
