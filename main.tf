@@ -939,8 +939,3 @@ YAML
     kubernetes_service.main
   ]
 }
-
-moved {
-  from = kubectl_manifest.main
-  to   = kubernetes_manifest.main
-}
