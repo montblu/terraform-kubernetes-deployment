@@ -155,7 +155,7 @@ variable "ecr_lifecycle_policy" {
       "selection": {
         "tagStatus": "tagged",
         "tagPatternList": [
-          "master-*",
+          "master-*"
         ],
         "countType": "imageCountMoreThan",
         "countNumber": 50
