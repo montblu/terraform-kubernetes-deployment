@@ -30,7 +30,7 @@ variable "deployment" {
       resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }), null)
       resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }), null)
       lifecycle         = optional(any, [])
-      security_context = optional(any, [])
+      security_context  = optional(any, [])
     })), [])
 
     containers = list(object({
@@ -150,12 +150,26 @@ variable "ecr_lifecycle_policy" {
 {
   "rules": [
     {
-      "rulePriority": 1,
-      "description": "Keep last 50 images (master,main)",
+      "rulePriority": 10,
+      "description": "Keep last 50 images (master)",
       "selection": {
         "tagStatus": "tagged",
         "tagPatternList": [
           "master-*",
+        ],
+        "countType": "imageCountMoreThan",
+        "countNumber": 50
+      },
+      "action": {
+        "type": "expire"
+      }
+    },
+    {
+      "rulePriority": 11,
+      "description": "Keep last 50 images (main)",
+      "selection": {
+        "tagStatus": "tagged",
+        "tagPatternList": [
           "main-*"
         ],
         "countType": "imageCountMoreThan",
@@ -166,7 +180,7 @@ variable "ecr_lifecycle_policy" {
       }
     },
     {
-      "rulePriority": 2,
+      "rulePriority": 20,
       "description": "Keep last 30 images (develop)",
       "selection": {
         "tagStatus": "tagged",
@@ -181,7 +195,7 @@ variable "ecr_lifecycle_policy" {
       }
     },
     {
-      "rulePriority": 3,
+      "rulePriority": 30,
       "description": "Keep last 10 images of the branches images",
       "selection": {
         "tagStatus": "any",
