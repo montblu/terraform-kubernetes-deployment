@@ -196,11 +196,11 @@ variable "ecr_lifecycle_policy" {
     },
     {
       "rulePriority": 30,
-      "description": "Keep last 10 images of the branches images",
+      "description": "Keep last 50 images of the branches images",
       "selection": {
         "tagStatus": "any",
         "countType": "imageCountMoreThan",
-        "countNumber": 10
+        "countNumber": 50
       },
       "action": {
         "type": "expire"
