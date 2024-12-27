@@ -115,6 +115,7 @@ variable "deployment" {
     })), [{ name = "http" }])
     svc_type                = optional(string, "ClusterIP")
     svc_load_balancer_class = optional(string)
+    svc_monitor_name        = optional(string)
     svc_monitor_path        = optional(string, "/metrics")
   })
 }
