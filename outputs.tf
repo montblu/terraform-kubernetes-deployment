@@ -12,3 +12,8 @@ output "deployment_labels" {
   description = "The labels of the deployment"
   value       = try(kubernetes_deployment.main[0].metadata[0].labels, {})
 }
+
+output "deployment_annotations" {
+  description = "The annotations of the deployment"
+  value       = try(kubernetes_deployment.main[0].metadata[0].annotations, {})
+}
