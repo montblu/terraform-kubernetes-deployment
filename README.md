@@ -45,5 +45,11 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_deployment_annotations"></a> [deployment\_annotations](#output\_deployment\_annotations) | The annotations of the deployment |
+| <a name="output_deployment_labels"></a> [deployment\_labels](#output\_deployment\_labels) | The labels of the deployment |
+| <a name="output_deployment_name"></a> [deployment\_name](#output\_deployment\_name) | The name of the deployment |
 | <a name="output_ecr_repository_url"></a> [ecr\_repository\_url](#output\_ecr\_repository\_url) | The URL of the ECR repository |
+| <a name="output_svc_address"></a> [svc\_address](#output\_svc\_address) | The address of the service within the cluster |
+| <a name="output_svc_name"></a> [svc\_name](#output\_svc\_name) | The name of the service |
+| <a name="output_svc_ports"></a> [svc\_ports](#output\_svc\_ports) | The port(s) of the service |
 <!-- END_TF_DOCS -->
