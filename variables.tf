@@ -103,6 +103,10 @@ variable "deployment" {
     ecr_scan_on_push    = optional(bool, true)
     ecr_encryption_type = optional(string, "KMS")
 
+    pdb_create          = optional(bool, true)
+    pdb_max_unavailable = optional(number, 1)
+    pdb_min_available   = optional(number)
+
     create_svc         = optional(bool, true)
     create_svc_monitor = optional(bool, false)
     svc_annotations    = optional(map(any), {})
