@@ -876,6 +876,23 @@ resource "kubernetes_deployment" "main" {
   ]
 }
 
+resource "kubernetes_pod_disruption_budget_v1" "main" {
+  count = var.deployment.create && var.deployment.pdb_create ? 1 : 0
+
+  metadata {
+    name      = local.resource_name
+    namespace = var.deployment.namespace
+  }
+
+  spec {
+    max_unavailable = var.deployment.pdb_max_unavailable
+    min_available   = var.deployment.pdb_min_available
+    selector {
+      match_labels = local.labels
+    }
+  }
+}
+
 ################################################################################
 # Kubernetes Service
 ################################################################################
