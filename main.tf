@@ -103,7 +103,8 @@ resource "kubernetes_deployment" "main" {
 
     template {
       metadata {
-        labels = local.labels
+        annotations = var.deployment.annotations
+        labels      = local.labels
       }
       spec {
         dynamic "affinity" {
