@@ -30,5 +30,5 @@ output "svc_ports" {
 
 output "svc_address" {
   description = "The address of the service within the cluster"
-  value       = "${kubernetes_service.main[0].metadata[0].name}.${kubernetes_service.main[0].metadata[0].namespace}.svc.cluster.local"
+  value       = try("${kubernetes_service.main[0].metadata[0].name}.${kubernetes_service.main[0].metadata[0].namespace}.svc.cluster.local", "")
 }
