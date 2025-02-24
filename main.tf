@@ -938,21 +938,27 @@ resource "kubernetes_service" "main" {
 resource "kubernetes_manifest" "main" {
   count = var.deployment.create && var.deployment.create_svc && var.deployment.create_svc_monitor ? 1 : 0
 
-  manifest = yamldecode(<<YAML
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: ${local.resource_name}
-  namespace: ${var.deployment.namespace}
-spec:
-  selector:
-    matchLabels:
-      app: ${local.resource_name}
-  endpoints:
-    - path: ${var.deployment.svc_monitor_path}
-      port: ${var.deployment.svc_monitor_port}
-YAML
-  )
+  manifest = {
+    apiVersion = "monitoring.coreos.com/v1"
+    kind       = "ServiceMonitor"
+    metadata = {
+      name      = local.resource_name
+      namespace = var.deployment.namespace
+    }
+    spec = {
+      selector = {
+        matchLabels = {
+          app = local.resource_name
+        }
+      }
+      endpoints = [
+        merge(
+          { path = var.deployment.svc_monitor_path },
+          var.deployment.svc_monitor_port != null ? { port = var.deployment.svc_monitor_port } : {},
+        ),
+      ]
+    }
+  }
 
   depends_on = [
     kubernetes_service.main
