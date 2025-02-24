@@ -949,8 +949,8 @@ spec:
     matchLabels:
       app: ${local.resource_name}
   endpoints:
-    - path: var.deployment.svc_monitor_path
-      port: var.deployment.svc_monitor_port
+    - path: ${var.deployment.svc_monitor_path}
+      port: ${var.deployment.svc_monitor_port}
 YAML
   )
 
