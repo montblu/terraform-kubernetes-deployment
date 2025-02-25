@@ -78,7 +78,7 @@ resource "kubernetes_deployment" "main" {
     name      = local.resource_name
     namespace = var.deployment.namespace
 
-    annotations = var.deployment.annotations
+    annotations = merge(var.deployment.annotations, var.deployment.deployment_annotations)
     labels      = local.labels
   }
 
@@ -103,7 +103,7 @@ resource "kubernetes_deployment" "main" {
 
     template {
       metadata {
-        annotations = var.deployment.annotations
+        annotations = var.deployment.template_annotations
         labels      = local.labels
       }
       spec {
