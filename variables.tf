@@ -4,7 +4,6 @@ variable "deployment" {
     name                      = string
     prefix                    = optional(string)
     namespace                 = string
-    annotations               = optional(map(string), {}) # DEPRECATED! Use deployment_annotations instead.
     deployment_annotations    = optional(map(string), {})
     template_annotations      = optional(map(string), {})
     labels                    = optional(map(string), {})
@@ -124,11 +123,6 @@ variable "deployment" {
     svc_monitor_port        = optional(string)
     svc_monitor_path        = optional(string, "/metrics")
   })
-
-  validation {
-    condition     = length(var.deployment.annotations) == 0 || (length(var.deployment.deployment_annotations) == 0 && length(var.deployment.template_annotations) == 0)
-    error_message = "`var.deployment.annotations` is deprecated, and cannot be used at the same time as `var.deployment.deployment_annotations` or `var.deployment.template_annotations`. Use `var.deployment.deployment_annotations` instead."
-  }
 }
 
 variable "image_repository" {
