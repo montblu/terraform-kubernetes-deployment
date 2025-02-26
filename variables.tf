@@ -4,7 +4,8 @@ variable "deployment" {
     name                      = string
     prefix                    = optional(string)
     namespace                 = string
-    annotations               = optional(map(string), {})
+    deployment_annotations    = optional(map(string), {})
+    template_annotations      = optional(map(string), {})
     labels                    = optional(map(string), {})
     replicas                  = optional(number, 1)
     progress_deadline_seconds = optional(number, 600)
