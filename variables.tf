@@ -2,7 +2,7 @@ variable "deployment" {
   description = "Kubernetes deployment configuration"
   type = object({
     name                      = string
-    prefix                    = optional(string)
+    prefix                    = string
     namespace                 = string
     deployment_annotations    = optional(map(string), {})
     template_annotations      = optional(map(string), {})
