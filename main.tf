@@ -27,7 +27,6 @@ resource "aws_ecr_repository" "main" {
   encryption_configuration {
     encryption_type = var.deployment.ecr_encryption_type
   }
-
 }
 
 resource "aws_ecr_lifecycle_policy" "main" {
@@ -111,7 +110,7 @@ resource "kubernetes_deployment" "main" {
           for_each = var.deployment.affinity
           content {
             dynamic "node_affinity" {
-              for_each = can(affinity.value["node_affinity"]) ? affinity.value["node_affinity"] : []
+              for_each = affinity.value.node_affinity
               content {
                 dynamic "required_during_scheduling_ignored_during_execution" {
                   for_each = can(node_affinity.value["required_during_scheduling_ignored_during_execution"]) ? node_affinity.value["required_during_scheduling_ignored_during_execution"] : []
@@ -154,7 +153,7 @@ resource "kubernetes_deployment" "main" {
               }
             }
             dynamic "pod_affinity" {
-              for_each = can(affinity.value["pod_affinity"]) ? affinity.value["pod_affinity"] : []
+              for_each = affinity.value.pod_affinity
               content {
                 dynamic "required_during_scheduling_ignored_during_execution" {
                   for_each = can(pod_affinity.value["required_during_scheduling_ignored_during_execution"]) ? pod_affinity.value["required_during_scheduling_ignored_during_execution"] : []
@@ -205,7 +204,7 @@ resource "kubernetes_deployment" "main" {
               }
             }
             dynamic "pod_anti_affinity" {
-              for_each = can(affinity.value["pod_anti_affinity"]) ? affinity.value["pod_anti_affinity"] : []
+              for_each = affinity.value.pod_anti_affinity
               content {
                 dynamic "required_during_scheduling_ignored_during_execution" {
                   for_each = can(pod_anti_affinity.value["required_during_scheduling_ignored_during_execution"]) ? pod_anti_affinity.value["required_during_scheduling_ignored_during_execution"] : []

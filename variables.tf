@@ -9,9 +9,15 @@ variable "deployment" {
     labels                    = optional(map(string), {})
     replicas                  = optional(number, 1)
     progress_deadline_seconds = optional(number, 600)
-    affinity                  = optional(list(map(any)), [])
-    volumes                   = optional(any, [])
-    wait_for_rollout          = optional(bool, false)
+    affinity = optional(list(
+      object({
+        node_affinity     = optional(list(map(any)), [])
+        pod_affinity      = optional(list(map(any)), [])
+        pod_anti_affinity = optional(list(map(any)), [])
+      })
+    ), [])
+    volumes          = optional(any, [])
+    wait_for_rollout = optional(bool, false)
     host_aliases = optional(list(object({
       ip        = optional(string, "")
       hostnames = optional(list(string), [])
