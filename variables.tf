@@ -3,7 +3,7 @@ variable "deployment" {
   type = object({
     name                      = string
     prefix                    = string
-    namespace                 = string
+    namespace                 = optional(string) # optional for create_ecr only
     deployment_annotations    = optional(map(string), {})
     template_annotations      = optional(map(string), {})
     labels                    = optional(map(string), {})
@@ -40,7 +40,7 @@ variable "deployment" {
       security_context  = optional(any, [])
     })), [])
 
-    containers = list(object({
+    containers = optional(list(object({
       name              = string
       image_tag         = optional(string, "")
       image_repository  = optional(string, "")
@@ -101,7 +101,7 @@ variable "deployment" {
         })), [])
       })), [])
       security_context = optional(any, [])
-    }))
+    })))
 
     termination_grace_period_seconds = optional(number)
 
