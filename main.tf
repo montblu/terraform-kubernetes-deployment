@@ -627,6 +627,47 @@ resource "kubernetes_deployment" "main" {
               }
             }
 
+            dynamic "startup_probe" {
+              for_each = can(container.value["startup_probe"]) ? container.value["startup_probe"] : []
+              content {
+
+                failure_threshold     = can(startup_probe.value["failure_threshold"]) ? startup_probe.value["failure_threshold"] : null
+                initial_delay_seconds = can(startup_probe.value["initial_delay_seconds"]) ? startup_probe.value["initial_delay_seconds"] : null
+                period_seconds        = can(startup_probe.value["period_seconds"]) ? startup_probe.value["period_seconds"] : null
+                success_threshold     = can(startup_probe.value["success_threshold"]) ? startup_probe.value["success_threshold"] : null
+                timeout_seconds       = can(startup_probe.value["timeout_seconds"]) ? startup_probe.value["timeout_seconds"] : null
+                dynamic "exec" {
+                  for_each = can(startup_probe.value["exec"]) ? startup_probe.value["exec"] : []
+                  content {
+                    command = can(exec.value["command"]) ? exec.value["command"] : null
+                  }
+                }
+                dynamic "http_get" {
+                  for_each = can(startup_probe.value["http_get"]) ? startup_probe.value["http_get"] : []
+                  content {
+                    host   = can(http_get.value["host"]) ? http_get.value["host"] : null
+                    path   = can(http_get.value["path"]) ? http_get.value["path"] : null
+                    port   = can(http_get.value["port"]) ? http_get.value["port"] : null
+                    scheme = can(http_get.value["scheme"]) ? http_get.value["scheme"] : null
+
+                    dynamic "http_header" {
+                      for_each = can(http_get.value["http_header"]) ? http_get.value["http_header"] : []
+                      content {
+                        name  = can(http_header.value["name"]) ? http_header.value["name"] : null
+                        value = can(http_header.value["value"]) ? http_header.value["value"] : null
+                      }
+                    }
+                  }
+                }
+                dynamic "tcp_socket" {
+                  for_each = can(startup_probe.value["tcp_socket"]) ? startup_probe.value["tcp_socket"] : []
+                  content {
+                    port = can(tcp_socket.value["port"]) ? tcp_socket.value["port"] : null
+                  }
+                }
+              }
+            }
+
             dynamic "liveness_probe" {
               for_each = can(container.value["liveness_probe"]) ? container.value["liveness_probe"] : []
               content {
@@ -659,7 +700,6 @@ resource "kubernetes_deployment" "main" {
                     }
                   }
                 }
-
                 dynamic "tcp_socket" {
                   for_each = can(liveness_probe.value["tcp_socket"]) ? liveness_probe.value["tcp_socket"] : []
                   content {
