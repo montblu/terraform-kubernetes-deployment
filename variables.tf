@@ -54,6 +54,29 @@ variable "deployment" {
       resource_limits   = optional(object({ cpu = optional(string), memory = optional(string) }), null)
       resource_requests = optional(object({ cpu = optional(string), memory = optional(string) }), null)
       lifecycle         = optional(any, [])
+      startup_probe = optional(list(object({
+        failure_threshold     = optional(number)
+        initial_delay_seconds = optional(number)
+        period_seconds        = optional(number)
+        success_threshold     = optional(number)
+        timeout_seconds       = optional(number)
+        exec = optional(list(object({
+          command = optional(list(string))
+        })), [])
+        http_get = optional(list(object({
+          host   = optional(string)
+          path   = optional(string)
+          port   = optional(number)
+          scheme = optional(string)
+          http_header = optional(list(object({
+            name  = optional(string)
+            value = optional(string)
+          })), [])
+        })), [])
+        tcp_socket = optional(list(object({
+          port = optional(number)
+        })), [])
+      })), [])
       liveness_probe = optional(list(object({
         failure_threshold     = optional(number)
         initial_delay_seconds = optional(number)
