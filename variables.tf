@@ -104,6 +104,7 @@ variable "deployment" {
     }))
 
     termination_grace_period_seconds = optional(number)
+    priority_class_name              = optional(string)
 
     create              = optional(bool, true)
     create_ecr          = optional(bool, false)

@@ -763,7 +763,8 @@ resource "kubernetes_deployment" "main" {
           }
         }
 
-        termination_grace_period_seconds = can(var.deployment.termination_grace_period_seconds) ? var.deployment.termination_grace_period_seconds : null
+        termination_grace_period_seconds = try(var.deployment.termination_grace_period_seconds, null)
+        priority_class_name              = try(var.deployment.priority_class_name, null)
 
         dynamic "volume" {
           for_each = var.deployment.volumes
