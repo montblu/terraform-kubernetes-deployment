@@ -106,6 +106,8 @@ resource "kubernetes_deployment" "main" {
         labels      = local.labels
       }
       spec {
+        enable_service_links = var.deployment.enable_service_links
+
         dynamic "affinity" {
           for_each = var.deployment.affinity
           content {
