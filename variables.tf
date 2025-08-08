@@ -9,6 +9,7 @@ variable "deployment" {
     labels                    = optional(map(string), {})
     replicas                  = optional(number, 1)
     progress_deadline_seconds = optional(number, 600)
+    enable_service_links      = optional(bool, true)
     affinity = optional(list(
       object({
         node_affinity     = optional(list(map(any)), [])
