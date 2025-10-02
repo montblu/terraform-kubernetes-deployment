@@ -107,6 +107,7 @@ resource "kubernetes_deployment" "main" {
       }
       spec {
         enable_service_links = var.deployment.enable_service_links
+        service_account_name = var.deployment.service_account_name
 
         dynamic "affinity" {
           for_each = var.deployment.affinity

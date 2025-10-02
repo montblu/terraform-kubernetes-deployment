@@ -4,6 +4,7 @@ variable "deployment" {
     name                      = string
     prefix                    = string
     namespace                 = string
+    service_account_name      = optional(string, null)
     deployment_annotations    = optional(map(string), {})
     template_annotations      = optional(map(string), {})
     labels                    = optional(map(string), {})
