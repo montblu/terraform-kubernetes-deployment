@@ -260,6 +260,17 @@ resource "kubernetes_deployment" "main" {
           }
         }
 
+        dynamic "toleration" {
+          for_each = var.deployment.toleration
+          content {
+            effect             = toleration.value["effect"]
+            key                = toleration.value["key"]
+            operator           = toleration.value["operator"]
+            toleration_seconds = toleration.value["toleration_seconds"]
+            value              = toleration.value["value"]
+          }
+        }
+
         dynamic "host_aliases" {
           for_each = var.deployment.host_aliases
 
