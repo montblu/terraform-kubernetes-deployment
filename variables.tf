@@ -18,6 +18,15 @@ variable "deployment" {
         pod_anti_affinity = optional(list(map(any)), [])
       })
     ), [])
+    toleration = optional(list(
+      object({
+        effect             = optional(string, "") # allowed values are "", NoSchedule, PreferNoSchedule and NoExecute.
+        key                = optional(string, "")
+        operator           = optional(string, "Equal") # Valid operators are Exists and Equal
+        toleration_seconds = optional(string, "")
+        value              = optional(string, "")
+      })
+    ), [])
     volumes          = optional(any, [])
     wait_for_rollout = optional(bool, false)
     host_aliases = optional(list(object({
