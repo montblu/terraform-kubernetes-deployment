@@ -100,7 +100,6 @@ variable "deployment" {
 
     create              = optional(bool, true)
     create_ecr          = optional(bool, false)
-    ecr_scan_on_push    = optional(bool, true)
     ecr_encryption_type = optional(string, "KMS")
 
     pdb_create          = optional(bool, true)
@@ -122,6 +121,11 @@ variable "deployment" {
     svc_monitor_port        = optional(string)
     svc_monitor_path        = optional(string, "/metrics")
   })
+}
+
+variable "ecr_scan_on_push" {
+  type        = list(string)
+  default     = []
 }
 
 variable "image_repository" {

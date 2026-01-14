@@ -19,15 +19,24 @@ resource "aws_ecr_repository" "main" {
   count = var.deployment.create && var.deployment.create_ecr ? 1 : 0
 
   name = local.resource_name
-
-  image_scanning_configuration {
-    scan_on_push = var.deployment.ecr_scan_on_push
-  }
-
   encryption_configuration {
     encryption_type = var.deployment.ecr_encryption_type
   }
 
+}
+
+resource "aws_ecr_registry_scanning_configuration" "registry_scanning" {
+  scan_type = "ENHANCED"
+  rule {
+    scan_frequency = "SCAN_ON_PUSH"
+    dynamic "repository_filter" {
+      for_each = length(var.ecr_scan_on_push) > 0 ? var.ecr_scan_on_push : ["dummy"]
+      content {
+        filter      = repository_filter.value
+        filter_type = "WILDCARD"
+      }
+    }
+  }
 }
 
 resource "aws_ecr_lifecycle_policy" "main" {
