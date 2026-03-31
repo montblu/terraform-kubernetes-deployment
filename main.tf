@@ -989,6 +989,12 @@ resource "kubernetes_service" "main" {
     load_balancer_class = var.deployment.svc_load_balancer_class
   }
 
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations["cloud.google.com/neg-status"],
+    ]
+  }
+
   depends_on = [
     kubernetes_deployment.main
   ]
