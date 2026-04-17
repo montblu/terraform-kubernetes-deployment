@@ -7,64 +7,7 @@ locals {
 
   labels = merge(local.base_labels, var.deployment.labels)
 
-  general_image_repository = var.deployment.create_ecr ? aws_ecr_repository.main[0].repository_url : (var.image_repository != "" ? var.image_repository : "")
-
   svc_labels = merge(local.base_labels, var.deployment.svc_labels)
-}
-
-################################################################################
-# ECR Repository
-################################################################################
-resource "aws_ecr_repository" "main" {
-  count = var.deployment.create && var.deployment.create_ecr ? 1 : 0
-
-  name = local.resource_name
-
-  image_scanning_configuration {
-    scan_on_push = var.deployment.ecr_scan_on_push
-  }
-
-  encryption_configuration {
-    encryption_type = var.deployment.ecr_encryption_type
-  }
-}
-
-resource "aws_ecr_lifecycle_policy" "main" {
-  count = var.deployment.create && var.deployment.create_ecr ? 1 : 0
-
-  repository = aws_ecr_repository.main[0].name
-  policy     = var.ecr_lifecycle_policy
-}
-
-# allow pull from all other accounts
-data "aws_iam_policy_document" "main" {
-  count = var.deployment.create && var.deployment.create_ecr && length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0
-
-  dynamic "statement" {
-    for_each = var.ecr_allowed_aws_accounts
-    content {
-      sid    = "Pull only for ${statement.value}"
-      effect = "Allow"
-      principals {
-        type = "AWS"
-        identifiers = [
-          "arn:aws:iam::${statement.value}:root"
-        ]
-      }
-      actions = [
-        "ecr:GetDownloadUrlForLayer",
-        "ecr:BatchGetImage",
-        "ecr:BatchCheckLayerAvailability",
-      ]
-    }
-  }
-}
-
-resource "aws_ecr_repository_policy" "main" {
-  count = var.deployment.create && var.deployment.create_ecr && length(var.ecr_allowed_aws_accounts) > 0 ? 1 : 0
-
-  repository = aws_ecr_repository.main[0].name
-  policy     = data.aws_iam_policy_document.main[0].json
 }
 
 ################################################################################
@@ -284,7 +227,7 @@ resource "kubernetes_deployment" "main" {
           for_each = var.deployment.init_container
           content {
             name              = init_container.value.name
-            image             = init_container.value.image_repository != "" ? "${init_container.value.image_repository}:${init_container.value.image_tag}" : "${local.general_image_repository}:${init_container.value.image_tag}"
+            image             = "${init_container.value.image_repository}:${init_container.value.image_tag}"
             image_pull_policy = init_container.value.image_pull_policy
             args              = init_container.value.args
             command           = init_container.value.command
@@ -487,7 +430,7 @@ resource "kubernetes_deployment" "main" {
           for_each = var.deployment.containers
           content {
             name              = container.value["name"]
-            image             = container.value.image_repository != "" ? "${container.value.image_repository}:${container.value.image_tag}" : "${local.general_image_repository}:${container.value.image_tag}"
+            image             = "${container.value.image_repository}:${container.value.image_tag}"
             image_pull_policy = container.value["image_pull_policy"]
             args              = container.value["args"]
             command           = container.value["command"]
@@ -845,15 +788,6 @@ resource "kubernetes_deployment" "main" {
               }
             }
 
-            dynamic "aws_elastic_block_store" {
-              for_each = can(volume.value["aws_elastic_block_store"]) ? volume.value["aws_elastic_block_store"] : []
-              content {
-                fs_type   = can(aws_elastic_block_store.value["fs_type"]) ? aws_elastic_block_store.value["fs_type"] : null
-                partition = can(aws_elastic_block_store.value["partition"]) ? aws_elastic_block_store.value["partition"] : null
-                read_only = can(aws_elastic_block_store.value["read_only"]) ? aws_elastic_block_store.value["read_only"] : null
-                volume_id = can(aws_elastic_block_store.value["volume_id"]) ? aws_elastic_block_store.value["volume_id"] : null
-              }
-            }
             dynamic "config_map" {
               for_each = can(volume.value["config_map"]) ? volume.value["config_map"] : []
               content {
@@ -933,10 +867,6 @@ resource "kubernetes_deployment" "main" {
   }
 
   wait_for_rollout = var.deployment.wait_for_rollout
-
-  depends_on = [
-    aws_ecr_lifecycle_policy.main
-  ]
 }
 
 resource "kubernetes_pod_disruption_budget_v1" "main" {
