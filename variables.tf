@@ -140,10 +140,7 @@ variable "deployment" {
     termination_grace_period_seconds = optional(number)
     priority_class_name              = optional(string)
 
-    create              = optional(bool, true)
-    create_ecr          = optional(bool, false)
-    ecr_scan_on_push    = optional(bool, true)
-    ecr_encryption_type = optional(string, "KMS")
+    create = optional(bool, true)
 
     pdb_create          = optional(bool, true)
     pdb_max_unavailable = optional(number, 1)
@@ -166,12 +163,6 @@ variable "deployment" {
   })
 }
 
-variable "image_repository" {
-  type        = string
-  description = "General repository from where to pull container images from. Specific repositories may still be defined on the respective containers."
-  default     = ""
-}
-
 variable "strategy_type" {
   type        = string
   description = "Type of deployment. Can be 'Recreate' or 'RollingUpdate'."
@@ -182,79 +173,4 @@ variable "strategy_rolling_update" {
   type        = list(any)
   description = "Rolling update config params. Present only if type = RollingUpdate."
   default     = []
-}
-
-variable "ecr_allowed_aws_accounts" {
-  type        = list(string)
-  description = "AWS accounts allowed to pull from the created ECR."
-  default     = []
-}
-
-variable "ecr_lifecycle_policy" {
-  type        = string
-  description = "Sets the lifecycle policy of the ECR. If set `ecr_number_of_images_to_keep` won't work."
-  default     = <<EOF
-{
-  "rules": [
-    {
-      "rulePriority": 10,
-      "description": "Keep last 50 images (master)",
-      "selection": {
-        "tagStatus": "tagged",
-        "tagPatternList": [
-          "master-*"
-        ],
-        "countType": "imageCountMoreThan",
-        "countNumber": 50
-      },
-      "action": {
-        "type": "expire"
-      }
-    },
-    {
-      "rulePriority": 11,
-      "description": "Keep last 50 images (main)",
-      "selection": {
-        "tagStatus": "tagged",
-        "tagPatternList": [
-          "main-*"
-        ],
-        "countType": "imageCountMoreThan",
-        "countNumber": 50
-      },
-      "action": {
-        "type": "expire"
-      }
-    },
-    {
-      "rulePriority": 20,
-      "description": "Keep last 30 images (develop)",
-      "selection": {
-        "tagStatus": "tagged",
-        "tagPatternList": [
-          "develop-*"
-        ],
-        "countType": "imageCountMoreThan",
-        "countNumber": 30
-      },
-      "action": {
-        "type": "expire"
-      }
-    },
-    {
-      "rulePriority": 30,
-      "description": "Keep last 50 images of the branches images",
-      "selection": {
-        "tagStatus": "any",
-        "countType": "imageCountMoreThan",
-        "countNumber": 50
-      },
-      "action": {
-        "type": "expire"
-      }
-    }
-  ]
-}
-
-EOF
 }
