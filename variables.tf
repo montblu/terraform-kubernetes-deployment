@@ -163,12 +163,6 @@ variable "deployment" {
   })
 }
 
-variable "image_repository" {
-  type        = string
-  description = "General repository from where to pull container images from. Specific repositories may still be defined on the respective containers."
-  default     = ""
-}
-
 variable "strategy_type" {
   type        = string
   description = "Type of deployment. Can be 'Recreate' or 'RollingUpdate'."
