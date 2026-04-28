@@ -18,6 +18,7 @@ variable "deployment" {
         pod_anti_affinity = optional(list(map(any)), [])
       })
     ), [])
+    node_selector             = optional(map(string), {})
     toleration = optional(list(
       object({
         effect             = optional(string, "") # allowed values are "", NoSchedule, PreferNoSchedule and NoExecute.
