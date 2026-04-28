@@ -160,6 +160,7 @@ variable "deployment" {
     svc_load_balancer_class = optional(string)
     svc_monitor_port        = optional(string)
     svc_monitor_path        = optional(string, "/metrics")
+    svc_monitor_interval    = optional(string, null)
   })
 }
 
