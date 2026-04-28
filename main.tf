@@ -203,6 +203,8 @@ resource "kubernetes_deployment" "main" {
           }
         }
 
+        node_selector = var.deployment.node_selector
+
         dynamic "toleration" {
           for_each = var.deployment.toleration
           content {
