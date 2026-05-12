@@ -156,11 +156,12 @@ variable "deployment" {
       port        = optional(number, 80)
       target_port = optional(number)
     })), [{ name = "http" }])
-    svc_type                = optional(string, "ClusterIP")
-    svc_load_balancer_class = optional(string)
-    svc_monitor_port        = optional(string)
-    svc_monitor_path        = optional(string, "/metrics")
-    svc_monitor_interval    = optional(string, null)
+    svc_type                  = optional(string, "ClusterIP")
+    svc_load_balancer_class   = optional(string)
+    svc_monitor_port          = optional(string)
+    svc_monitor_path          = optional(string, "/metrics")
+    svc_monitor_interval      = optional(string, null)
+    svc_monitor_scrapetimeout = optional(string, null)
   })
 }
 

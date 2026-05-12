@@ -954,6 +954,7 @@ resource "kubernetes_manifest" "main" {
           { path = var.deployment.svc_monitor_path },
           var.deployment.svc_monitor_port != null ? { port = var.deployment.svc_monitor_port } : {},
           var.deployment.svc_monitor_interval != null ? { interval = var.deployment.svc_monitor_interval } : {},
+          var.deployment.svc_monitor_scrapetimeout != null ? { scrapeTimeout = var.deployment.svc_monitor_scrapetimeout } : {},
         ),
       ]
     }
