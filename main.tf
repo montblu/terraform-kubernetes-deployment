@@ -964,3 +964,48 @@ resource "kubernetes_manifest" "main" {
     kubernetes_service.main
   ]
 }
+
+################################################################################
+# Kubernetes Horizontal Pod Autoscaler
+################################################################################
+resource "kubernetes_horizontal_pod_autoscaler_v2" "main" {
+  count = var.deployment.create && var.deployment.create_hpa ? 1 : 0
+
+  metadata {
+    name      = local.resource_name
+    namespace = var.deployment.namespace
+  }
+
+  spec {
+    min_replicas = var.deployment.hpa_min_replicas
+    max_replicas = var.deployment.hpa_max_replicas
+
+    scale_target_ref {
+      api_version = "apps/v1"
+      kind        = "Deployment"
+      name        = local.resource_name
+    }
+
+    dynamic "metric" {
+      for_each = var.deployment.hpa_metrics
+      content {
+        type = metric.value["type"]
+
+        dynamic "resource" {
+          for_each = can(metric.value["resource"]) ? metric.value["resource"] : []
+          content {
+            name = resource.value["name"]
+            target {
+              type                = can(resource.value["target_type"]) ? resource.value["target_type"] : "Utilization"
+              average_utilization = can(resource.value["average_utilization"]) ? resource.value["average_utilization"] : null
+            }
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    kubernetes_deployment.main
+  ]
+}
