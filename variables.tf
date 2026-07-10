@@ -162,6 +162,11 @@ variable "deployment" {
     svc_monitor_path          = optional(string, "/metrics")
     svc_monitor_interval      = optional(string, null)
     svc_monitor_scrapetimeout = optional(string, null)
+
+    create_hpa       = optional(bool, false)
+    hpa_min_replicas = optional(number, 1)
+    hpa_max_replicas = optional(number, 3)
+    hpa_metrics      = optional(any, [])
   })
 }
 
