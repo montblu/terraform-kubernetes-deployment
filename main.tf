@@ -13,7 +13,7 @@ locals {
 ################################################################################
 # Kubernetes Deployment
 ################################################################################
-resource "kubernetes_deployment" "main" {
+resource "kubernetes_deployment_v1" "main" {
   count = var.deployment.create ? 1 : 0
 
   metadata {
@@ -889,7 +889,7 @@ resource "kubernetes_pod_disruption_budget_v1" "main" {
 ################################################################################
 # Kubernetes Service
 ################################################################################
-resource "kubernetes_service" "main" {
+resource "kubernetes_service_v1" "main" {
   count = var.deployment.create && var.deployment.create_svc ? 1 : 0
 
   metadata {
@@ -926,7 +926,7 @@ resource "kubernetes_service" "main" {
   }
 
   depends_on = [
-    kubernetes_deployment.main
+    kubernetes_deployment_v1.main
   ]
 }
 
@@ -961,7 +961,7 @@ resource "kubernetes_manifest" "main" {
   }
 
   depends_on = [
-    kubernetes_service.main
+    kubernetes_service_v1.main
   ]
 }
 
@@ -1006,6 +1006,6 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "main" {
   }
 
   depends_on = [
-    kubernetes_deployment.main
+    kubernetes_deployment_v1.main
   ]
 }
