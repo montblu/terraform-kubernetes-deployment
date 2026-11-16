@@ -143,8 +143,8 @@ variable "deployment" {
     create = optional(bool, true)
 
     pdb_create          = optional(bool, true)
-    pdb_max_unavailable = optional(number, 1)
-    pdb_min_available   = optional(number)
+    pdb_max_unavailable = optional(string, "1")
+    pdb_min_available   = optional(string)
 
     create_svc         = optional(bool, true)
     create_svc_monitor = optional(bool, false)
